@@ -74,4 +74,8 @@ data_mc <- data %>% filter(YEAR == 2022 & MONTH == 3)
 rm(.Random.seed)
 save(data_mc, file = "EBD/ebd_IN_relMar-2022_MAR.RData")
 
+# for previous 3 months' information
+data_history <- data %>% filter((YEAR == 2021 & MONTH == 12) | (YEAR == 2022 & MONTH < 3))
+save(data_history, file = "EBD/ebd_IN_relMar-2022_MAR_history.RData")
+
 
