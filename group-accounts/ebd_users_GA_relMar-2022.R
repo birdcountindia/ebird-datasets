@@ -34,8 +34,8 @@ data1 <- data0 %>%
   select(OBSERVER.ID)
 
 
-prev_GAlist <- read_csv("group-accounts/ebd_users_GA_relSep-2021.csv") %>%
-  select(-c(S.NO, FULL.NAME)) 
+prev_GAlist <- read_csv("group-accounts/ebd_users_GA_relDec-2021.csv") %>%
+  select(-FULL.NAME) 
 
 
 data2 <- data1 %>% 
