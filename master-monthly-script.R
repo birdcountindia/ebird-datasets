@@ -6,7 +6,7 @@ library(tidyverse)
 # - latest sensitive species data .txt file 
 # - latest group accounts data .csv file 
 # - spatial data (pre-processed) as "maps.RData" file
-# - BCI logo as transparent .png file
+# - BCI logo with circular frame as .png file
 
 
 #### variable parameters ####
@@ -15,7 +15,7 @@ library(tidyverse)
 # but will stay same for a number of months at a time
 
 # update when latest available
-senspath <- "EBD/ebd_sensitive_relDec-2021_IN.txt" 
+senspath <- "EBD/ebd_sensitive_relMay-2022_IN.txt" 
 groupaccspath <- "group-accounts/ebd_users_GA_relDec-2021.csv"
 
 dataset_str <- "ebd_IN_prv_rel" # or "ebd_IN_rel" if no unvetted data
@@ -92,6 +92,7 @@ met_week <- function(dates) {
   
   return(ifelse(leap_year(dates), leapyear[yearday], normalyear[yearday])) 
 }
+
 data <- data %>% 
   mutate(GROUP.ID = ifelse(is.na(GROUP.IDENTIFIER), SAMPLING.EVENT.IDENTIFIER, 
                            GROUP.IDENTIFIER), 
@@ -208,8 +209,9 @@ load("maps.RData")
 
 require(magick)
 require(scales) # for comma format of numbers
+require(grid)
 
-map_cov_logo <- image_convert(image_read("bcilogo.png"), matte = T)
+map_cov_logo <- image_convert(image_read("bcilogo-framed.png"), matte = T)
 
 map_cov_text <- glue::glue("{label_comma()(data_cov$LOCATIONS)} locations
                       {label_comma()(data_cov$LISTS)} lists
@@ -252,8 +254,8 @@ map_cov <- ggplot() +
   coord_cartesian(clip = "off") +
   theme(plot.margin = unit(c(1,1,0,23), "lines")) +
   annotation_raster(map_cov_logo, 
-                    ymin = 32, ymax = 35,
-                    xmin = 49, xmax = 59) +
+                    ymin = 31, ymax = 37,
+                    xmin = 49, xmax = 55) +
   annotation_custom(textGrob(label = map_cov_text,
                              hjust = 0,
                              gp = gpar(col = "#FCFA53", cex = 1.5)),
