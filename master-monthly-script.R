@@ -1,5 +1,7 @@
 library(lubridate)
 library(tidyverse)
+library(glue)
+library(data.table)
 
 ### required files in directory: ###
 # - latest EBD release .txt file
@@ -7,6 +9,8 @@ library(tidyverse)
 # - latest group accounts data .csv file 
 # - spatial data (pre-processed) as "maps.RData" file
 # - BCI logo with circular frame as .png file
+
+###   ###
 
 
 #### variable parameters ####
@@ -27,28 +31,45 @@ preimp <- c("CATEGORY","COMMON.NAME","OBSERVATION.COUNT",
             "NUMBER.OBSERVERS","ALL.SPECIES.REPORTED","GROUP.IDENTIFIER","SAMPLING.EVENT.IDENTIFIER",
             "TRIP.COMMENTS","HAS.MEDIA")
 
+preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DATE",
+                    # "OBSERVATION.COUNT",
+                    "OBSERVER.ID", "SAMPLING.EVENT.IDENTIFIER", "ALL.SPECIES.REPORTED",
+                    "GROUP.IDENTIFIER", "HAS.MEDIA", "APPROVED")
 
 #### automation parameters ####
 
-# (only works when using new release data in the month it comes out, i.e., 
-# working with relJun in July)
+# (only works when using new rel. data in the month it comes out, e.g., working with relJun in July)
 
 cur_year <- today() %>% year()
 cur_month_num <- today() %>% month()
 cur_month_lab <- today() %>% month(label = T, abbr = T)
 
-req_year <- (today() - months(1)) %>% year()
-req_month_num <- (today() - months(1)) %>% month()
-req_month_lab <- (today() - months(1)) %>% month(label = T, abbr = T) 
+rel_year <- (today() - months(1)) %>% year()
+rel_month_num <- (today() - months(1)) %>% month()
+rel_month_lab <- (today() - months(1)) %>% month(label = T, abbr = T) 
 
-rawpath <- glue::glue("EBD/{dataset_str}{req_month_lab}-{req_year}.txt")
+# for PJ's metrics
+CurMonth <- rel_month_num
+CurYear <- rel_year
+PrevYear <- rel_year - 1
+Months <- seq((today() - months(6)), (today() - months(1)), by = "month") %>% month()
 
-maindatapath <-  glue::glue("EBD/ebd_IN_rel{req_month_lab}-{req_year}.RData")
-pmpdatapath <- glue::glue("EBD/pmp_rel{req_month_lab}-{req_year}.RData")
-mcdatapath <-  glue::glue("EBD/ebd_IN_rel{req_month_lab}-{req_year}_{toupper(req_month_lab)}.RData")
 
-coveragedatapath <- glue::glue("ebirding-coverage/data/coverage_rel{req_month_lab}-{req_year}.csv")
-coveragemappath <- glue::glue("ebirding-coverage/maps/coverage_rel{req_month_lab}-{req_year}.png")
+zippath <- glue("EBD/{dataset_str}{rel_month_lab}-{rel_year}.zip")
+rawfile <- glue("{dataset_str}{rel_month_lab}-{rel_year}.txt")
+rawpath <- glue("EBD/{rawfile}")
+
+maindatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}.RData")
+pmpdatapath <- glue("EBD/pmp_rel{rel_month_lab}-{rel_year}.RData")
+mcdatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_{toupper(rel_month_lab)}.RData")
+
+coveragedatapath <- glue("ebirding-coverage/data/coverage_rel{rel_month_lab}-{rel_year}.csv")
+coveragemappath <- glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}.png")
+
+#### unzipping EBD download ####
+
+unzip(zipfile = zippath, files = rawfile, exdir = "EBD") # don't add trailing slash in path
+
 
 #### main data processing steps ####
 
@@ -127,7 +148,7 @@ save(data_pmp, file = pmpdatapath)
 
 #### filtering for monthly challenge ####
 
-data_mc <- data %>% filter(YEAR == req_year, MONTH == req_month_num)
+data_mc <- data %>% filter(YEAR == rel_year, MONTH == rel_month_num)
 
 rm(.Random.seed)
 save(data_mc, file = mcdatapath)
@@ -224,7 +245,7 @@ map_cov_text <- glue::glue("{label_comma()(data_cov$LOCATIONS)} locations
                       {label_comma()(data_cov$SPECIES)} species
                       {label_comma()(round(data_cov$OBSERVATIONS, 1))} million observations")
 
-map_cov_footer <- glue::glue("Data until {req_month_lab} {req_year}")
+map_cov_footer <- glue::glue("Data until {rel_month_lab} {rel_year}")
 
 
 data_loc <- data %>% distinct(LONGITUDE, LATITUDE)
@@ -269,3 +290,164 @@ map_cov <- ggplot() +
 
 ggsave(map_cov, file = coveragemappath, 
        units = "in", width = 13, height = 9, bg = "transparent", dpi = 300)
+
+#### generating PJ's monthly metrics out of EBD ####
+
+print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {zippath}"))
+
+
+nms2 <- names(read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", 
+                        stringsAsFactors = F, na.strings = c(""," ", NA)))
+nms2[!(nms2 %in% preimp_metrics)] <- "NULL"
+nms2[nms2 %in% preimp_metrics] <- NA
+ebd <- read.delim(rawpath, colClasses = nms2, sep = "\t", header = T, quote = "",
+                  # nrows = 100000, # For testing, this is useful
+                  stringsAsFactors = F, na.strings = c(""," ",NA)) 
+
+
+### new user stats before preparing data for other analyses/metrics ###
+india_new_users_stats <- setDT(ebd)[, 
+                                    .(OBSERVATION.DATE = min(OBSERVATION.DATE)), 
+                                    by = OBSERVER.ID] %>% # dt takes 1.29 sec while tidy takes 8.65 sec
+  mutate(OBSERVATION.DATE = as.Date(OBSERVATION.DATE),
+         YEAR = year(OBSERVATION.DATE),
+         MONTH = month(OBSERVATION.DATE)) %>%
+  group_by(YEAR, MONTH) %>%
+  summarise(count = n_distinct(OBSERVER.ID)) %>%
+  ungroup() %>%
+  filter(YEAR > CurYear - 2)
+
+
+### preparing data (filtering + adding useful columns) ###
+ebd <- ebd %>%
+  mutate(GROUP.ID = ifelse(is.na(GROUP.IDENTIFIER), SAMPLING.EVENT.IDENTIFIER, 
+                           GROUP.IDENTIFIER), 
+         OBSERVATION.DATE = as.Date(OBSERVATION.DATE), 
+         YEAR = year(OBSERVATION.DATE), 
+         MONTH = month(OBSERVATION.DATE)) %>% 
+  filter(APPROVED == 1, YEAR > CurYear - 2)
+
+
+# ### Reassign states ###
+# ebd <- ebd %>% mutate (STATE.CODE =
+#                         ifelse (STATE.CODE %in% states_assign$state_in,
+#                                 states_assign [states_assign$state_in == STATE.CODE,] %>%
+#                                   select (state_out) %>% pull(),
+#                                 STATE.CODE))
+
+
+states <- read_csv("BCI-metrics/states.csv")
+
+
+india_obsv_stats <- ebd %>% 
+  group_by(YEAR, MONTH) %>%
+  summarise(count = n_distinct(COMMON.NAME, GROUP.ID)) %>%
+  ungroup()
+
+india_list_stats <- ebd %>% 
+  filter(ALL.SPECIES.REPORTED == 1) %>%
+  group_by(YEAR, MONTH) %>%
+  summarise(count = n_distinct(GROUP.ID)) %>%
+  ungroup()
+
+india_media_list_stats <- ebd %>% 
+  filter(HAS.MEDIA == 1) %>%
+  group_by(YEAR, MONTH) %>%
+  summarise(count = n_distinct(GROUP.ID)) %>%
+  ungroup()
+
+india_user_stats <- ebd %>%
+  group_by(YEAR, MONTH) %>%
+  summarise(count = n_distinct(OBSERVER.ID)) %>%
+  ungroup()
+
+india_media_user_stats <- ebd %>%
+  filter(HAS.MEDIA == 1) %>%
+  group_by(YEAR, MONTH) %>%
+  summarise(count = n_distinct(OBSERVER.ID)) %>%
+  ungroup()
+
+state_obsv_stats <- ebd %>% 
+  group_by(STATE.CODE, YEAR, MONTH) %>%
+  summarise(count = n_distinct(COMMON.NAME, GROUP.ID)) %>%
+  ungroup()
+
+state_list_stats <- ebd %>% 
+  filter(ALL.SPECIES.REPORTED == 1) %>%
+  group_by(STATE.CODE, YEAR, MONTH) %>%
+  summarise(count = n_distinct(GROUP.ID)) %>%
+  ungroup()
+
+state_user_stats <- ebd %>%
+  group_by(STATE.CODE, YEAR, MONTH) %>%
+  summarise(count = n_distinct(OBSERVER.ID)) %>%
+  ungroup()
+
+min_no_of_lists <- 15
+
+county_coverage_stats <- ebd %>% 
+  group_by(STATE.CODE, YEAR, MONTH, COUNTY.CODE) %>% 
+  summarise(count = n_distinct(GROUP.ID)) %>%
+  ungroup() %>% 
+  mutate(covered = ifelse(count >= min_no_of_lists, 1, 0)) %>%
+  filter(covered == 1) %>%
+  left_join(states, by = "STATE.CODE") %>% 
+  group_by(STATE.CODE, YEAR, MONTH) %>%
+  summarise(coverage = round(100 * sum(covered) / min(Districts), 0))
+
+
+districts <- ebd %>% distinct(COUNTY.CODE)
+
+district_obsv_stats <- ebd %>% 
+  group_by(COUNTY.CODE, YEAR, MONTH) %>%
+  summarise(count = n_distinct(COMMON.NAME, GROUP.ID)) %>%
+  ungroup() 
+
+district_list_stats <- ebd %>% 
+  filter(ALL.SPECIES.REPORTED == 1) %>%
+  group_by(COUNTY.CODE, YEAR, MONTH) %>%
+  summarise(count = n_distinct(GROUP.ID)) %>%
+  ungroup() 
+
+district_user_stats <- ebd %>%
+  group_by(COUNTY.CODE, YEAR, MONTH) %>%
+  summarise(count = n_distinct(OBSERVER.ID)) %>%
+  ungroup() 
+
+
+###   ###
+
+
+accounting <- function (number)
+{
+  #  return(number)
+  return (ifelse (is.finite(number),paste0(number),"_"))
+  #  return (ifelse (is.finite(number), ifelse (number >=0, paste0(number), paste0("(", -number, ")")),"_"))
+}
+
+
+photo_stats <<- 0
+sound_stats <<- 0
+video_stats <<- 0
+source ("BCI-metrics/mediaMlMetrics.R")
+
+pullMediaStats()
+
+# Move this to mediaMLMetrics later
+colnames(photo_stats) <- c("YEAR", "MONTH", "count")
+colnames(sound_stats) <- c("YEAR", "MONTH", "count")
+colnames(video_stats) <- c("YEAR", "MONTH", "count")
+
+source("BCI-metrics/indiaMetrics.R")
+source("BCI-metrics/stateMetrics.R")
+source("BCI-metrics/districtMetrics.R")
+
+india_metrics <- genIndiaMetrics()
+state_metrics <- genStateMetrics()
+district_metrics <- genDistrictMetrics()
+
+write.csv2(india_metrics, "BCI-metrics/india_metrics.csv")
+
+write.csv2(state_metrics, "BCI-metrics/state_metrics.csv", row.names = FALSE)
+
+write.csv2(district_metrics, "BCI-metrics/district_metrics.csv", row.names = FALSE)
