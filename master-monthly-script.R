@@ -1,7 +1,7 @@
 library(lubridate)
 library(tidyverse)
 library(glue)
-library(data.table)
+# library(data.table) # required, but won't load now
 
 ### required files in directory: ###
 # - latest EBD release .txt file
@@ -31,6 +31,7 @@ preimp <- c("CATEGORY","COMMON.NAME","OBSERVATION.COUNT",
             "NUMBER.OBSERVERS","ALL.SPECIES.REPORTED","GROUP.IDENTIFIER","SAMPLING.EVENT.IDENTIFIER",
             "TRIP.COMMENTS","HAS.MEDIA")
 
+# for PJ's metrics
 preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DATE",
                     # "OBSERVATION.COUNT",
                     "OBSERVER.ID", "SAMPLING.EVENT.IDENTIFIER", "ALL.SPECIES.REPORTED",
@@ -64,7 +65,8 @@ pmpdatapath <- glue("EBD/pmp_rel{rel_month_lab}-{rel_year}.RData")
 mcdatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_{toupper(rel_month_lab)}.RData")
 
 coveragedatapath <- glue("ebirding-coverage/data/coverage_rel{rel_month_lab}-{rel_year}.csv")
-coveragemappath <- glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}.png")
+coveragemappath1 <- glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_annot.png")
+coveragemappath2 <- glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_plain.png")
 
 #### unzipping EBD download ####
 
@@ -250,7 +252,51 @@ map_cov_footer <- glue::glue("Data until {rel_month_lab} {rel_year}")
 
 data_loc <- data %>% distinct(LONGITUDE, LATITUDE)
 
-map_cov <- ggplot() +
+
+### map with annotations of stats and BCI logo ###
+map_cov_annot <- ggplot() +
+  geom_polygon(data = indiamap, aes(x = long, y = lat, group = group), 
+               colour = NA, fill = "black")+
+  geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
+             colour = "#fcfa53", size = 0.05, stroke = 0) +
+  # scale_x_continuous(expand = c(0,0)) +
+  # scale_y_continuous(expand = c(0,0)) +
+  theme_bw() +
+  theme(axis.line = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        # panel.border = element_blank(),
+        plot.background = element_rect(fill = "black", colour = NA),
+        panel.background = element_rect(fill = "black", colour = NA),
+        plot.title = element_text(hjust = 0.5))+
+  coord_cartesian(clip = "off") +
+  theme(plot.margin = unit(c(2,2,0,23), "lines")) +
+  annotation_raster(map_cov_logo, 
+                    ymin = 4.5, ymax = 6.5,
+                    xmin = 46.5, xmax = 53.1) +
+  annotation_custom(textGrob(label = map_cov_text,
+                             hjust = 0,
+                             gp = gpar(col = "#FCFA53", cex = 1.5)),
+                    ymin = 19, ymax = 31,
+                    xmin = 40, xmax = 53)  +
+  annotation_custom(textGrob(label = map_cov_footer,
+                             hjust = 0,
+                             gp = gpar(col = "#D2D5DA", cex = 1.0)),
+                    ymin = 15, ymax = 16,
+                    xmin = 40, xmax = 53) 
+
+ggsave(map_cov_annot, file = coveragemappath1, 
+       units = "in", width = 13, height = 9, bg = "transparent", dpi = 300)
+
+
+### plain map without annotations ###
+map_cov_plain <- ggplot() +
   geom_polygon(data = indiamap, aes(x = long, y = lat, group = group), 
                colour = NA, fill = "black")+
   geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
@@ -271,25 +317,11 @@ map_cov <- ggplot() +
         # panel.border = element_blank(),
         plot.background = element_rect(fill = "black", colour = NA),
         panel.background = element_rect(fill = "black", colour = NA),
-        plot.title = element_text(hjust = 0.5))+
-  coord_cartesian(clip = "off") +
-  theme(plot.margin = unit(c(1,1,0,23), "lines")) +
-  annotation_raster(map_cov_logo, 
-                    ymin = 31, ymax = 37,
-                    xmin = 49, xmax = 55) +
-  annotation_custom(textGrob(label = map_cov_text,
-                             hjust = 0,
-                             gp = gpar(col = "#FCFA53", cex = 1.5)),
-                    ymin = 12, ymax = 24,
-                    xmin = 42, xmax = 55)  +
-  annotation_custom(textGrob(label = map_cov_footer,
-                             hjust = 0,
-                             gp = gpar(col = "#D2D5DA", cex = 1.0)),
-                    ymin = 8, ymax = 9,
-                    xmin = 42, xmax = 55) 
+        plot.title = element_text(hjust = 0.5)) +
+  coord_map()
 
-ggsave(map_cov, file = coveragemappath, 
-       units = "in", width = 13, height = 9, bg = "transparent", dpi = 300)
+ggsave(map_cov_plain, file = coveragemappath2, 
+       units = "in", width = 8, height = 11, bg = "transparent", dpi = 300)
 
 #### generating PJ's monthly metrics out of EBD ####
 
@@ -306,9 +338,9 @@ ebd <- read.delim(rawpath, colClasses = nms2, sep = "\t", header = T, quote = ""
 
 
 ### new user stats before preparing data for other analyses/metrics ###
-india_new_users_stats <- setDT(ebd)[, 
-                                    .(OBSERVATION.DATE = min(OBSERVATION.DATE)), 
-                                    by = OBSERVER.ID] %>% # dt takes 1.29 sec while tidy takes 8.65 sec
+india_new_users_stats <- data.table::setDT(ebd)[, 
+                                                .(OBSERVATION.DATE = min(OBSERVATION.DATE)), 
+                                                by = OBSERVER.ID] %>% # dt takes 1.29 sec while tidy takes 8.65 sec
   mutate(OBSERVATION.DATE = as.Date(OBSERVATION.DATE),
          YEAR = year(OBSERVATION.DATE),
          MONTH = month(OBSERVATION.DATE)) %>%
@@ -446,8 +478,8 @@ india_metrics <- genIndiaMetrics()
 state_metrics <- genStateMetrics()
 district_metrics <- genDistrictMetrics()
 
-write.csv2(india_metrics, "BCI-metrics/india_metrics.csv")
+write_csv(india_metrics, "BCI-metrics/india_metrics.csv")
 
-write.csv2(state_metrics, "BCI-metrics/state_metrics.csv", row.names = FALSE)
+write_csv(state_metrics, "BCI-metrics/state_metrics.csv", row.names = FALSE)
 
-write.csv2(district_metrics, "BCI-metrics/district_metrics.csv", row.names = FALSE)
+write_csv(district_metrics, "BCI-metrics/district_metrics.csv", row.names = FALSE)
