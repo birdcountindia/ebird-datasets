@@ -2,13 +2,14 @@ library(lubridate)
 library(tidyverse)
 library(glue)
 # library(data.table) # required, but won't load now
+library(googledrive)
 
 ### required files in directory: ###
 # - latest EBD release .txt file
 # - latest sensitive species data .txt file 
 # - latest group accounts data .csv file 
 # - spatial data (pre-processed) as "maps.RData" file
-# - BCI logo with circular frame as .png file
+# - BCI logo with translucent bg frame as .png file
 
 ###   ###
 
@@ -323,6 +324,10 @@ map_cov_plain <- ggplot() +
 ggsave(map_cov_plain, file = coveragemappath2, 
        units = "in", width = 8, height = 11, bg = "transparent", dpi = 300)
 
+drive_auth(email = "karthik.t@ncf-india.org")
+drive_upload(coveragemappath1, "Coverage-maps/")
+drive_upload(coveragemappath2, "Coverage-maps/")
+
 #### generating PJ's monthly metrics out of EBD ####
 
 print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {zippath}"))
@@ -479,7 +484,5 @@ state_metrics <- genStateMetrics()
 district_metrics <- genDistrictMetrics()
 
 write_csv(india_metrics, "BCI-metrics/india_metrics.csv")
-
 write_csv(state_metrics, "BCI-metrics/state_metrics.csv", row.names = FALSE)
-
 write_csv(district_metrics, "BCI-metrics/district_metrics.csv", row.names = FALSE)
