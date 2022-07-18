@@ -12,11 +12,11 @@ library(googledrive)
 ### required files in directory: ###
 # - latest EBD release .txt file
 # - latest sensitive species data .txt file 
-# - latest group accounts data .csv file 
+# - latest users data .txt file 
+# - previous group accounts list .csv file
 # - spatial data (pre-processed) as "maps.RData" file
 # - BCI logo with translucent bg frame as .png file
 # - five different R scipts in BCI-metrics/ folder
-
 ###   ###
 
 
@@ -27,7 +27,7 @@ library(googledrive)
 
 # update when latest available
 senspath <- "EBD/ebd_sensitive_relMay-2022_IN.txt" 
-groupaccspath <- "group-accounts/ebd_users_GA_relDec-2021.csv"
+groupaccspath <- "group-accounts/ebd_users_GA_relMay-2022.csv"
 
 dataset_str <- "ebd_IN_prv_rel" # or "ebd_IN_rel" if no unvetted data
 
@@ -67,6 +67,7 @@ zippath <- glue("EBD/{dataset_str}{rel_month_lab}-{rel_year}.zip")
 rawfile <- glue("{dataset_str}{rel_month_lab}-{rel_year}.txt")
 rawpath <- glue("EBD/{rawfile}")
 
+
 maindatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}.RData")
 pmpdatapath <- glue("EBD/pmp_rel{rel_month_lab}-{rel_year}.RData")
 mcdatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_{toupper(rel_month_lab)}.RData")
@@ -75,10 +76,15 @@ coveragedatapath <- glue("ebirding-coverage/data/coverage_rel{rel_month_lab}-{re
 coveragemappath1 <- glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_annot.png")
 coveragemappath2 <- glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_plain.png")
 
-#### unzipping EBD download ####
+#### unzipping EBD download (if not done already) ####
 
-unzip(zipfile = zippath, files = rawfile, exdir = "EBD") # don't add trailing slash in path
-
+if (!file.exists(rawpath) & file.exists(zippath)) {
+  unzip(zipfile = zippath, files = rawfile, exdir = "EBD") # don't add trailing slash in path
+} else if (!file.exists(rawpath) & !file.exists(zippath)) {
+  print("Latest data download does not exist!")
+} else {
+  print("Data download already unzipped.")
+}
 
 #### main data processing steps ####
 
@@ -144,13 +150,15 @@ save(data, file = maindatapath)
 pmp_months <- seq(1, 12, by = 2) # odd months
 
 if (cur_month_num %in% pmp_months) {
-
-data_pmp <- data %>% group_by(GROUP.ID) %>%
-  filter(any(OBSERVER.ID == "obsr2607928")) %>% # PMP's eBird account ID
-  ungroup()
-
-save(data_pmp, file = pmpdatapath)
-
+  
+  data_pmp <- data %>% group_by(GROUP.ID) %>%
+    filter(any(OBSERVER.ID == "obsr2607928")) %>% # PMP's eBird account ID
+    ungroup()
+  
+  save(data_pmp, file = pmpdatapath)
+  
+} else {
+  print("Quitting from filtering for PMP.")
 }
 
 
@@ -330,12 +338,16 @@ map_cov_plain <- ggplot() +
 ggsave(map_cov_plain, file = coveragemappath2, 
        units = "in", width = 8, height = 11, bg = "transparent", dpi = 300)
 
-drive_auth(email = "karthik.t@ncf-india.org")
-drive_upload(coveragemappath1, "Coverage-maps/")
-drive_upload(coveragemappath2, "Coverage-maps/")
+
+
+drive_auth(email = "birdcountindia@gmail.com")
+
+drive_upload(coveragedatapath, "ebirding-coverage/data/")
+drive_upload(coveragemappath1, "ebirding-coverage/maps/")
+drive_upload(coveragemappath2, "ebirding-coverage/maps/")
 
 #### generating PJ's monthly metrics out of EBD ####
 
-print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {zippath}"))
+print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
 
 source("BCI-metrics/ebdMetrics.R")

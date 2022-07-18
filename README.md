@@ -1,6 +1,12 @@
-# ebird-datasets
+# Working with eBird datasets
 
-This concerns the Indian eBirding community and data. The repo has code mainly for importing, morphing and exporting various datasets for various usecases, storing them in appropriate forms for further use. It also contains a master script that automates many of Bird Count India's regular (monthly) data fiddling.
+This concerns the Indian eBirding community and data. The repo has code mainly for importing, morphing and exporting various datasets for various usecases, storing them in appropriate forms for further use. It also contains a master script that automates many of Bird Count India's regular (monthly) data tasks.
+
+## Automated BCI data tasks
+
+**One master R script linked to a master batch file to run several monthly data tasks in one go: `master-monthly-script.R`**
+
+*If latest users data is available, the group accounts list should be updated before running the automated master monthly script.*
 
 ## `group-accounts/`
 

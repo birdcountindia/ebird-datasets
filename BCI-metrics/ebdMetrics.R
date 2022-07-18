@@ -153,5 +153,5 @@ state_metrics <- genStateMetrics()
 district_metrics <- genDistrictMetrics()
 
 write_csv(india_metrics, "BCI-metrics/india_metrics.csv")
-write_csv(state_metrics, "BCI-metrics/state_metrics.csv", row.names = FALSE)
-write_csv(district_metrics, "BCI-metrics/district_metrics.csv", row.names = FALSE)
+write_csv(state_metrics, "BCI-metrics/state_metrics.csv")
+write_csv(district_metrics, "BCI-metrics/district_metrics.csv")
