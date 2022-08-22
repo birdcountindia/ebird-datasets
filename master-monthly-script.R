@@ -6,6 +6,7 @@ library(magick)
 library(scales) # for comma format of numbers
 library(grid)
 library(googledrive)
+library(googlesheets4)
 
 # library(data.table) # required, but later command explicitly calls for it
 
@@ -356,13 +357,17 @@ ggsave(map_cov_plain, file = coveragemappath2,
        units = "in", width = 8, height = 11, bg = "transparent", dpi = 300)
 
 
+#### uploading to GDrive ####
 
 drive_auth(email = "birdcountindia@gmail.com")
 
+# overwrites existing ss
+sheet_write(data_cov, 
+            ss = "https://docs.google.com/spreadsheets/d/1EAMiznrLPe4yZ47GIfItl2m4KucZ--RkkLFqRSfm_ts/")
+
 # "put" overwrites/updates existing file whereas "upload" creates new files each time
-drive_put(coveragedatapath, "ebirding-coverage/data/coverage_rel{rel_month_lab}-{rel_year}.csv")
-drive_put(coveragemappath1, "ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_annot.png")
-drive_put(coveragemappath2, "ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_plain.png")
+drive_put(coveragemappath1, "ebirding-coverage/maps/ebirding-coverage_annot.png")
+drive_put(coveragemappath2, "ebirding-coverage/maps/ebirding-coverage_plain.png")
 
 #### generating PJ's monthly metrics out of EBD ####
 
