@@ -221,7 +221,7 @@ data2 <- cbind(temp1, temp2, temp3)
 ### cumulative birding hours ###
 data3 <- data0 %>% 
   filter(!is.na(DURATION.MINUTES)) %>% 
-  summarise(HOURS = sum(DURATION.MINUTES)/60)
+  summarise(HOURS = round(sum(DURATION.MINUTES)/60, 2))
 
 ### people ###
 groupaccs <- read_csv(groupaccspath) %>% 
@@ -250,11 +250,18 @@ data6 <- data %>%
 
 
 ### observations ###
-data7 <- data %>% summarise(OBSERVATIONS = n()/1000000) # in millions
+data7 <- data %>% summarise(OBSERVATIONS = round(n()/1000000, 2)) # in millions
 
 
 ### coverage data csv ###
 data_cov <- cbind(data1, data2, data3, data4, data5, data6, data7)
+
+names(data_cov) <- c("Unique locations", "Total lists", "Complete lists", "Lists with media",
+                     "eBirding hours", "eBirders", "States", "Districts", "Species",
+                     "Total observations (in millions)")
+data_cov <- data_cov %>% 
+  pivot_longer(names_to = "Statistic", values_to = "Value")
+
 write_csv(data_cov, coveragedatapath)
 
 
