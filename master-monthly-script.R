@@ -7,16 +7,16 @@ library(scales) # for comma format of numbers
 library(grid)
 library(googledrive)
 
-# library(data.table) # required, but won't load now
+# library(data.table) # required, but later command explicitly calls for it
 
 ### required files in directory: ###
-# - latest EBD release .txt file
+# - latest EBD release .zip/.txt file
 # - latest sensitive species data .txt file 
 # - latest users data .txt file 
 # - previous group accounts list .csv file
 # - spatial data (pre-processed) as "maps.RData" file
 # - BCI logo with translucent bg frame as .png file
-# - five different R scipts in BCI-metrics/ folder
+# - five different R scripts in BCI-metrics/ folder
 ###   ###
 
 
@@ -46,15 +46,32 @@ preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DAT
 
 #### automation parameters ####
 
-# (only works when using new rel. data in the month it comes out, e.g., working with relJun in July)
+### (only works when using new rel. data in the month it comes out, e.g., working with relJun in July)
 
-cur_year <- today() %>% year()
-cur_month_num <- today() %>% month()
-cur_month_lab <- today() %>% month(label = T, abbr = T)
+# to make code robust against (day == 31) in which case the other lines produce NA:
 
-rel_year <- (today() - months(1)) %>% year()
-rel_month_num <- (today() - months(1)) %>% month()
-rel_month_lab <- (today() - months(1)) %>% month(label = T, abbr = T) 
+# date under consideration for current leaderboard
+cur_date <- if (today() %>% day() == 31) { 
+  (today() - days(1)) %>% floor_date(unit = "month")
+} else {
+  today() %>% floor_date(unit = "month")
+}
+
+rel_date <- if (today() %>% day() == 31) {
+  (today() - days(1)) - months(1) %>%
+    floor_date(unit = "month")
+} else {
+  today() - months(1) %>%
+    floor_date(unit = "month")
+  }
+
+cur_year <- cur_date %>% year()
+cur_month_num <- cur_date %>% month()
+cur_month_lab <- cur_date %>% month(label = T, abbr = T)
+
+rel_year <- rel_date %>% year()
+rel_month_num <- rel_date %>% month()
+rel_month_lab <- rel_date %>% month(label = T, abbr = T) 
 
 # for PJ's metrics
 CurMonth <- rel_month_num
