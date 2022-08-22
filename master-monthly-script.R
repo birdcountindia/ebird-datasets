@@ -359,9 +359,10 @@ ggsave(map_cov_plain, file = coveragemappath2,
 
 drive_auth(email = "birdcountindia@gmail.com")
 
-drive_upload(coveragedatapath, "ebirding-coverage/data/")
-drive_upload(coveragemappath1, "ebirding-coverage/maps/")
-drive_upload(coveragemappath2, "ebirding-coverage/maps/")
+# "put" overwrites/updates existing file whereas "upload" creates new files each time
+drive_put(coveragedatapath, "ebirding-coverage/data/coverage_rel{rel_month_lab}-{rel_year}.csv")
+drive_put(coveragemappath1, "ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_annot.png")
+drive_put(coveragemappath2, "ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_plain.png")
 
 #### generating PJ's monthly metrics out of EBD ####
 
