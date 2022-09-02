@@ -53,10 +53,25 @@ ids <- responses2 %>%
   bind_rows(temp) %>% 
   # retaining users with no info but removing users with extra NA row
   group_by(NAME) %>% 
-  arrange(OBSERVER.ID) %>% 
+  arrange(NAME, OBSERVER.ID) %>% 
   slice(1) %>% 
   ungroup() %>% 
   distinct(OBSERVER.ID, NAME, EBIRD.NAME)
+
+ids2 <- ids %>% 
+  filter(is.na(OBSERVER.ID)) %>% 
+  left_join(eBird_users, by = c("NAME" = "EBIRD.NAME")) %>% 
+  mutate(OBSERVER.ID = if_else(is.na(OBSERVER.ID.x), OBSERVER.ID.y, OBSERVER.ID.x)) %>% 
+  select(NAME, OBSERVER.ID, EBIRD.NAME) %>% 
+  # if this step successfully found a user ID, eBird name and form name are same
+  mutate(EBIRD.NAME = if_else(is.na(OBSERVER.ID), EBIRD.NAME, NAME))
+
+ids <- ids %>% 
+  bind_rows(ids2) %>% 
+  group_by(NAME) %>% 
+  arrange(NAME, OBSERVER.ID) %>% 
+  slice(1) %>% 
+  ungroup()
 
 data_filt <- data %>% filter(OBSERVER.ID %in% ids$OBSERVER.ID)
 data0_filt <- data0 %>% filter(OBSERVER.ID %in% ids$OBSERVER.ID)
