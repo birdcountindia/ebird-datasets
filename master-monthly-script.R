@@ -247,9 +247,9 @@ data5 <- data0 %>%
 
 ### species ###
 data6 <- data %>% 
-  mutate(CATEGORY = case_when(CATEGORY == "domestic" & 
+  mutate(CATEGORY = case_when(CATEGORY == "domestic" &
                                 COMMON.NAME == "Rock Pigeon" ~ "species",
-                              TRUE ~ CATEGORY)) %>% 
+                              TRUE ~ CATEGORY)) %>%
   filter(APPROVED == 1, CATEGORY %in% c("species", "issf")) %>% 
   summarise(SPECIES = n_distinct(COMMON.NAME))
 
@@ -261,12 +261,13 @@ data7 <- data %>% summarise(OBSERVATIONS = round(n()/1000000, 2)) # in millions
 ### coverage data csv ###
 data_cov <- cbind(data1, data2, data3, data4, data5, data6, data7)
 
+# to write data with better columns and longer format
 data_cov2 <- data_cov
 names(data_cov2) <- c("Unique locations", "Total lists", "Complete lists", "Lists with media",
                      "eBirding hours", "eBirders", "States", "Districts", "Species",
                      "Total observations (in millions)")
 data_cov2 <- data_cov2 %>% 
-  pivot_longer(everything(), names_to = "Statistic", values_to = "Value")
+  pivot_longer(cols = everything(), names_to = "Statistic", values_to = "Value")
 
 write_csv(data_cov2, coveragedatapath)
 
