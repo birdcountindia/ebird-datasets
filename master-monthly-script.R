@@ -59,10 +59,10 @@ cur_date <- if (today() %>% day() == 31) {
 }
 
 rel_date <- if (today() %>% day() == 31) {
-  (today() - days(1)) - months(1) %>%
+  ((today() - days(1)) - months(1)) %>%
     floor_date(unit = "month")
 } else {
-  today() - months(1) %>%
+  (today() - months(1)) %>%
     floor_date(unit = "month")
   }
 
@@ -189,6 +189,11 @@ rm(.Random.seed)
 save(data_mc, file = mcdatapath)
 
 
+#### generating PJ's monthly metrics out of EBD ####
+
+print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
+
+source("BCI-metrics/ebdMetrics.R")
 #### creating monthly coverage stats ####
 
 data0 <- data %>% 
@@ -256,13 +261,14 @@ data7 <- data %>% summarise(OBSERVATIONS = round(n()/1000000, 2)) # in millions
 ### coverage data csv ###
 data_cov <- cbind(data1, data2, data3, data4, data5, data6, data7)
 
-names(data_cov) <- c("Unique locations", "Total lists", "Complete lists", "Lists with media",
+data_cov2 <- data_cov
+names(data_cov2) <- c("Unique locations", "Total lists", "Complete lists", "Lists with media",
                      "eBirding hours", "eBirders", "States", "Districts", "Species",
                      "Total observations (in millions)")
-data_cov <- data_cov %>% 
-  pivot_longer(names_to = "Statistic", values_to = "Value")
+data_cov2 <- data_cov2 %>% 
+  pivot_longer(everything(), names_to = "Statistic", values_to = "Value")
 
-write_csv(data_cov, coveragedatapath)
+write_csv(data_cov2, coveragedatapath)
 
 
 
@@ -367,17 +373,14 @@ ggsave(map_cov_plain, file = coveragemappath2,
 #### uploading to GDrive ####
 
 drive_auth(email = "birdcountindia@gmail.com")
+gs4_auth(email = "birdcountindia@gmail.com")
 
 # overwrites existing ss
-sheet_write(data_cov, 
+sheet_write(data_cov2, 
+            sheet = "data_cov2",
             ss = "https://docs.google.com/spreadsheets/d/1EAMiznrLPe4yZ47GIfItl2m4KucZ--RkkLFqRSfm_ts/")
 
 # "put" overwrites/updates existing file whereas "upload" creates new files each time
 drive_put(coveragemappath1, "ebirding-coverage/maps/ebirding-coverage_annot.png")
 drive_put(coveragemappath2, "ebirding-coverage/maps/ebirding-coverage_plain.png")
 
-#### generating PJ's monthly metrics out of EBD ####
-
-print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
-
-source("BCI-metrics/ebdMetrics.R")
