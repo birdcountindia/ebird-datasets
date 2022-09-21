@@ -32,12 +32,12 @@ groupaccspath <- "group-accounts/ebd_users_GA_relMay-2022.csv"
 
 dataset_str <- "ebd_IN_prv_rel" # or "ebd_IN_rel" if no unvetted data
 
-preimp <- c("CATEGORY","COMMON.NAME","OBSERVATION.COUNT",
+preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
             "LOCALITY.ID","LOCALITY.TYPE","REVIEWED","APPROVED","STATE","COUNTY","LAST.EDITED.DATE",
             "LATITUDE","LONGITUDE","OBSERVATION.DATE","TIME.OBSERVATIONS.STARTED","OBSERVER.ID",
             "PROTOCOL.TYPE","DURATION.MINUTES","EFFORT.DISTANCE.KM","LOCALITY","BREEDING.CODE",
             "NUMBER.OBSERVERS","ALL.SPECIES.REPORTED","GROUP.IDENTIFIER","SAMPLING.EVENT.IDENTIFIER",
-            "TRIP.COMMENTS","HAS.MEDIA")
+            "TRIP.COMMENTS","SPECIES.COMMENTS", "HAS.MEDIA")
 
 # for PJ's metrics
 preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DATE",
@@ -132,8 +132,8 @@ senssp <- read.delim(senspath, colClasses = nms1, sep = "\t", header = T, quote 
 
 ### combing the two ###
 data <- bind_rows(data, senssp) %>% 
-  # filtering unvetted as well as exotic species
-  filter(APPROVED == 1)
+  # filtering unvetted as well as exotic species (provisional and escapee)
+  filter(APPROVED == 1 & !(EXOTIC.CODE %in% c("P", "X")))
 
 
 ### adding useful columns ###
