@@ -285,14 +285,14 @@ map_cov_logo <- image_convert(image_read("bcilogo-framed.png"), matte = T)
 
 map_cov_text <- glue::glue("{label_comma()(data_cov$LOCATIONS)} locations
                       {label_comma()(data_cov$LISTS)} lists
-                      {label_comma()(round(data_cov$HOURS))} hours
+                      {label_comma()(data_cov$HOURS)} hours
                       {label_comma()(data_cov$PEOPLE)} people
                       
                       {label_comma()(data_cov$STATES)} states/UTs
                       {label_comma()(data_cov$DISTRICTS)} districts
                       
                       {label_comma()(data_cov$SPECIES)} species
-                      {label_comma()(round(data_cov$OBSERVATIONS, 1))} million observations")
+                      {round(data_cov$OBSERVATIONS, 1)} million observations")
 
 map_cov_footer <- glue::glue("Data until {rel_month_lab} {rel_year}")
 
@@ -347,7 +347,7 @@ map_cov_plain <- ggplot() +
   geom_polygon(data = indiamap, aes(x = long, y = lat, group = group), 
                colour = NA, fill = "black")+
   geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
-             colour = "#fcfa53", size = 0.05, stroke = 0) +
+             colour = "#fcfa53", size = 0.05, stroke = 0.1) +
   # scale_x_continuous(expand = c(0,0)) +
   # scale_y_continuous(expand = c(0,0)) +
   theme_bw() +
