@@ -87,6 +87,7 @@ rawpath <- glue("EBD/{rawfile}")
 
 
 maindatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}.RData")
+slicedatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_slice.RData")
 pmpdatapath <- glue("EBD/pmp_rel{rel_month_lab}-{rel_year}.RData")
 mcdatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_{toupper(rel_month_lab)}.RData")
 
@@ -163,6 +164,16 @@ data <- data %>%
 rm(.Random.seed)
 save(data, file = maindatapath)
 
+
+### sliced data ###
+data_slice_G <- data %>% group_by(GROUP.ID) %>% slice(1) %>% ungroup()
+# data_slice_S <- data %>% group_by(SAMPLING.EVENT.IDENTIFIER) %>% slice(1) %>% ungroup()
+
+if (exists("data_slice_S")) {
+  save(data_slice_G, data_slice_S, file = slicedatapath)
+} else {
+  save(data_slice_G, file = slicedatapath)
+}
 
 #### filtering for PMP (only for alternate months) ####
 
