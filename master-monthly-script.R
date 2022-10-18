@@ -148,17 +148,17 @@ met_week <- function(dates) {
 }
 
 data <- data %>% 
-  mutate(BREEDING.CODE = str_trim(BREEDING.CODE), # trimming whitespace in breeding codes
-         GROUP.ID = ifelse(is.na(GROUP.IDENTIFIER), SAMPLING.EVENT.IDENTIFIER, 
-                           GROUP.IDENTIFIER), 
+  # trimming whitespace in breeding codes
+  mutate(BREEDING.CODE = str_trim(BREEDING.CODE)) %>% 
+  # group ID and dates
+  mutate(GROUP.ID = ifelse(is.na(GROUP.IDENTIFIER), SAMPLING.EVENT.IDENTIFIER, GROUP.IDENTIFIER), 
          OBSERVATION.DATE = as.Date(OBSERVATION.DATE), 
          YEAR = year(OBSERVATION.DATE), 
          MONTH = month(OBSERVATION.DATE),
-         DAY.M = day(OBSERVATION.DATE)) 
-# DAY.Y = yday(OBSERVATION.DATE), 
-# WEEK.Y = met_week(OBSERVATION.DATE), 
-# M.YEAR = if_else(DAY.Y <= 151, YEAR-1, YEAR), # from 1st June to 31st May
-# WEEK.MY = if_else(WEEK.Y > 21, WEEK.Y-21, 52-(21-WEEK.Y)))
+         DAY.M = day(OBSERVATION.DATE)) %>% 
+  # migratory year and month information
+  mutate(M.YEAR = if_else(MONTH > 5, YEAR, YEAR-1), # from June to May
+         M.MONTH = if_else(MONTH > 5, MONTH-5, 12-(5-MONTH))) 
 
 rm(.Random.seed)
 save(data, file = maindatapath)
