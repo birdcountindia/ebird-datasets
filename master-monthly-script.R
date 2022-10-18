@@ -148,7 +148,8 @@ met_week <- function(dates) {
 }
 
 data <- data %>% 
-  mutate(GROUP.ID = ifelse(is.na(GROUP.IDENTIFIER), SAMPLING.EVENT.IDENTIFIER, 
+  mutate(BREEDING.CODE = str_trim(BREEDING.CODE), # trimming whitespace in breeding codes
+         GROUP.ID = ifelse(is.na(GROUP.IDENTIFIER), SAMPLING.EVENT.IDENTIFIER, 
                            GROUP.IDENTIFIER), 
          OBSERVATION.DATE = as.Date(OBSERVATION.DATE), 
          YEAR = year(OBSERVATION.DATE), 
@@ -194,6 +195,7 @@ save(data_mc, file = mcdatapath)
 print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
 
 source("BCI-metrics/ebdMetrics.R")
+
 #### creating monthly coverage stats ####
 
 data0 <- data %>% 
