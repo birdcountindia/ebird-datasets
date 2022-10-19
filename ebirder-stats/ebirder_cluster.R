@@ -41,6 +41,9 @@ cluster_data <- for_cluster %>%
 
 # no need to scale the data because all variables on same scale (ordinal 1-5)
 
+# checking for correlation between variables
+var_cor <- cor(cluster_data, method = "spearman")
+
 
 # distance object (default: Euclidean)
 dist <- cluster_data %>% get_dist()
@@ -76,7 +79,26 @@ cluster_type <- cluster_out$centers %>%
   arrange(desc(EBIRD.FAMILIARITY), desc(EBIRD.DATA.QUAL), desc(BIRD.KNOW), 
           desc(IP.COMM.SKILL), desc(COACH.WILL))
 
+cluster_type_long <- cluster_type %>% 
+  pivot_longer(2:6, names_to = "VARIABLE", values_to = "SCORE") %>% 
+  mutate(VARIABLE = factor(VARIABLE, 
+                           levels = c("EBIRD.FAMILIARITY", "EBIRD.DATA.QUAL", "BIRD.KNOW", 
+                                      "IP.COMM.SKILL", "COACH.WILL")),
+         VARIABLE.NUM = as.numeric(VARIABLE))
 
 # saving into excel sheet
 write_xlsx(x = list("Results" = cluster_result, "Cluster means" = cluster_type),
            path = "ebirder-stats/ebirder_cluster_results.xlsx")
+
+
+# Parallel Coordinates Plot 
+# (ref https://openclassrooms.com/en/courses/5869986-perform-an-exploratory-data-analysis/6177861-analyze-the-results-of-a-k-means-clustering)
+par_coord_plot <- ggplot(cluster_type_long, aes(VARIABLE.NUM, SCORE, colour = CLUSTER)) +
+  geom_line(size = 1.1) +
+  scale_x_continuous(name = "Variable", labels = unique(cluster_type_long$VARIABLE)) +
+  scale_y_continuous(name = "Score") +
+  scale_color_discrete(name = "Cluster") +
+  theme_classic()
+
+ggsave("ebirder-stats/ebirder_cluster_plot.png", par_coord_plot,
+       width = 11, height = 6, units = "in", dpi = 300)
