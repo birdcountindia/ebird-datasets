@@ -66,7 +66,7 @@ map_cov_annot <- ggplot() +
                     ymin = 15, ymax = 16,
                     xmin = 40, xmax = 53) 
 
-ggsave(map_cov_annot, file = "map_cov_annot.png", device = "png",
+ggsave(map_cov_annot, file = "map_cov_annot.png", device = ragg::agg_png,
        units = "in", width = 13, height = 9, bg = "transparent", dpi = 300)
 
 
