@@ -148,8 +148,9 @@ map_cov_annot <- ggplot() +
                     xmin = 40, xmax = 53) 
 
 ggsave(map_cov_annot, file = coveragemappath1, 
+       # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
+       device = png,
        units = "in", width = 13, height = 9, bg = "transparent", dpi = 300)
-
 
 ### plain map without annotations ###
 map_cov_plain <- ggplot() +
@@ -177,6 +178,8 @@ map_cov_plain <- ggplot() +
   coord_map()
 
 ggsave(map_cov_plain, file = coveragemappath2, 
+       # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
+       device = png,
        units = "in", width = 8, height = 11, bg = "transparent", dpi = 300)
 
 print("Monthly coverage maps created.")
