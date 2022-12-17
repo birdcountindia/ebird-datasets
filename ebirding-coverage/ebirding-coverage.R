@@ -172,7 +172,7 @@ for (i in unique(state_info$STATE)) {
   
 #### creating monthly coverage point map for states ####
 
-tictoc::tic("Monthly coverage maps for states") 
+tictoc::tic("Monthly coverage maps for states COMPLETE") 
 count <- 0
 for (i in unique(state_info$STATE)) {
   
@@ -194,7 +194,6 @@ for (i in unique(state_info$STATE)) {
                              {label_comma()(data_cov_state$HOURS)} hours
                              {label_comma()(data_cov_state$PEOPLE)} people
                              
-                             {label_comma()(data_cov_state$STATES)} states/UTs
                              {label_comma()(data_cov_state$DISTRICTS)} districts
                              
                              {label_comma()(data_cov_state$SPECIES)} species
@@ -205,58 +204,17 @@ for (i in unique(state_info$STATE)) {
   
   data_loc <- data %>% filter(STATE == cur_state) %>% distinct(LONGITUDE, LATITUDE)
   
+  cur_bbox <- data_loc %>% st_as_sf(coords = c("LONGITUDE", "LATITUDE")) %>% st_bbox()
+  plot_lims()
   
-  # ### map with annotations of stats and BCI logo ###
-  # map_cov_annot <- ggplot() +
-  #   geom_sf(data = filter(statemap_sf, STATE == cur_state),
-  #           colour = NA, fill = "black") +
-  #   geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
-  #              colour = "#fcfa53", size = 0.05, stroke = 0) +
-  #   # scale_x_continuous(expand = c(0,0)) +
-  #   # scale_y_continuous(expand = c(0,0)) +
-  #   theme_bw() +
-  #   theme(axis.line = element_blank(),
-  #         axis.text.x = element_blank(),
-  #         axis.text.y = element_blank(),
-  #         axis.ticks = element_blank(),
-  #         axis.title.x = element_blank(),
-  #         axis.title.y = element_blank(),
-  #         panel.grid.major = element_blank(),
-  #         panel.grid.minor = element_blank(),
-  #         panel.border = element_blank(),
-  #         # panel.border = element_blank(),
-  #         plot.background = element_rect(fill = "black", colour = NA),
-  #         panel.background = element_rect(fill = "black", colour = NA),
-  #         plot.title = element_text(hjust = 0.5)) +
-  #   coord_sf(clip = "off") +
-  #   theme(plot.margin = unit(c(2,2,0,23), "lines")) +
-  #   annotation_raster(map_cov_logo, 
-  #                     ymin = 4.5, ymax = 6.5,
-  #                     xmin = 46.5, xmax = 53.1) +
-  #   annotation_custom(textGrob(label = map_cov_text,
-  #                              hjust = 0,
-  #                              gp = gpar(col = "#FCFA53", cex = 1.5)),
-  #                     ymin = 19, ymax = 31,
-  #                     xmin = 40, xmax = 53)  +
-  #   annotation_custom(textGrob(label = map_cov_footer,
-  #                              hjust = 0,
-  #                              gp = gpar(col = "#D2D5DA", cex = 1.0)),
-  #                     ymin = 15, ymax = 16,
-  #                     xmin = 40, xmax = 53) 
-  # 
-  # ggsave(map_cov_annot, file = coveragemappath1, 
-  #        # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
-  #        device = png,
-  #        units = "in", width = 13, height = 9, bg = "transparent", dpi = 300)
+  annot_lims()
   
-  ### plain map without annotations ###
-  map_cov_plain <- ggplot() +
+  ### map with annotations of stats and BCI logo ###
+  map_cov_annot <- ggplot() +
     geom_sf(data = filter(statemap_sf, STATE == cur_state),
             colour = NA, fill = "black") +
-    geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
-               colour = "#fcfa53", size = 0.05, stroke = 0.1) +
-    # scale_x_continuous(expand = c(0,0)) +
-    # scale_y_continuous(expand = c(0,0)) +
+    geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE),
+               colour = "#fcfa53", size = 0.05, stroke = 0) +
     theme_bw() +
     theme(axis.line = element_blank(),
           axis.text.x = element_blank(),
@@ -267,16 +225,59 @@ for (i in unique(state_info$STATE)) {
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.border = element_blank(),
-          plot.margin = unit(c(0, 0, 0, 0), "cm"),
-          # panel.border = element_blank(),
           plot.background = element_rect(fill = "black", colour = NA),
           panel.background = element_rect(fill = "black", colour = NA),
-          plot.title = element_text(hjust = 0.5))
+          plot.title = element_text(hjust = 0.5)) +
+    coord_sf(clip = "off", xlim = xlimit, ylim = ylimit) +
+    theme(plot.margin = unit(c(0,0,0,24), "lines")) +
+    annotation_raster(map_cov_logo,
+                      ymin = a1$ymin, ymax = a1$ymax,
+                      xmin = a1$xmin, xmax = a1$xmax) +
+    annotation_custom(textGrob(label = map_cov_text,
+                               hjust = 0,
+                               gp = gpar(col = "#FCFA53", cex = 1.0)),
+                      ymin = a2$ymin, ymax = a2$ymax,
+                      xmin = a2$xmin, xmax = a2$xmax) +
+    annotation_custom(textGrob(label = map_cov_footer,
+                               hjust = 0,
+                               gp = gpar(col = "#D2D5DA", cex = 0.7)),
+                      ymin = a3$ymin, ymax = a3$ymax,
+                      xmin = a3$xmin, xmax = a3$xmax) 
+  
+  ggsave(coveragemappath1, map_cov_annot,
+         # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
+         device = png,
+         units = "in", width = 10, height = 7, bg = "black", dpi = 300)
+  
+  
+  ### plain map without annotations ###
+  map_cov_plain <- ggplot() +
+    geom_sf(data = filter(statemap_sf, STATE == cur_state),
+            colour = NA, fill = "black") +
+    geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
+               colour = "#fcfa53", size = 0.05, stroke = 0) +
+    labs(title = str_to_upper(cur_state)) +
+    theme_bw() +
+    theme(axis.line = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          plot.margin = unit(c(0.75, 1.5, 1.5, 1.5), "lines"),
+          plot.background = element_rect(fill = "black", colour = NA),
+          panel.background = element_rect(fill = "black", colour = NA),
+          plot.title = element_text(hjust = 0.5, colour = "#FCFA53")) +
+    coord_sf(clip = "off", xlim = xlimit, ylim = ylimit) 
+
     
   ggsave(map_cov_plain, file = coveragemappath2, 
          # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
          device = png,
-         units = "in", width = 8, height = 11, bg = "transparent", dpi = 300)
+         units = "in", width = 8, height = 8, bg = "black", dpi = 300)
   
   print(glue("Monthly coverage maps for {cur_state} ({count}/37) created."))
 }

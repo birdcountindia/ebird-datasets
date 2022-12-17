@@ -1,0 +1,103 @@
+STATE,NO,ymin,ymax
+Andhra Pradesh,a1,10.775,11.415
+Andhra Pradesh,a2,13.75,18
+Andhra Pradesh,a3,13.285,13.535
+Arunachal Pradesh,a1,24.85,25.25
+Arunachal Pradesh,a2,26.8,29.3
+Arunachal Pradesh,a3,26.455,26.555
+Assam,a1,22.422,22.885
+Assam,a2,24.85,27.35
+Assam,a3,24.275,24.375
+Bihar,a1,23.0925,23.451
+Bihar,a2,24.698,27.198
+Bihar,a3,24.518,24.618
+Daman and Diu,a1,19.3185,19.4735
+Daman and Diu,a2,20.256,20.856
+Daman and Diu,a3,19.9442,19.9742
+Delhi,a1,28.3462,28.3829
+Delhi,a2,28.542,28.7355
+Delhi,a3,28.49,28.505
+Gujarat,a1,17.62,18.22
+Gujarat,a2,20.659,24.1577
+Gujarat,a3,20.045,20.145
+Himachal Pradesh,a1,30.045,30.262
+Himachal Pradesh,a2,31.205,32.347
+Himachal Pradesh,a3,30.9257,30.9507
+Jammu and Kashmir,a1,31.865,32.07
+Jammu and Kashmir,a2,32.876,34.1165
+Jammu and Kashmir,a3,32.705,32.71
+Jharkhand,a1,21.057,21.38
+Jharkhand,a2,23.53,23.73
+Jharkhand,a3,22.376,22.396
+Ladakh,a1,31,31.4715
+Ladakh,a2,33.44,36.07
+Ladakh,a3,32.915,32.965
+Madhya Pradesh,a1,18.845,19.5
+Madhya Pradesh,a2,22.335,25.8
+Madhya Pradesh,a3,21.5205,21.5705
+Maharashtra,a1,13.595,14.25
+Maharashtra,a2,16.875,20.645
+Maharashtra,a3,16.245,16.275
+Meghalaya,a1,23.866,24.085
+Meghalaya,a2,25.008,26.211
+Meghalaya,a3,24.764,24.766
+Nagaland,a1,25.187,25.315
+Nagaland,a2,25.85616,26.55259
+Nagaland,a3,25.68401,25.74187
+Odisha,a1,16.345,16.821
+Odisha,a2,18.915,21.35
+Odisha,a3,18.2,18.4
+Puducherry,a1,9.45,9.995
+Puducherry,a2,12.385,15.242
+Puducherry,a3,11.6,11.8
+Punjab,a1,29.44,29.647
+Punjab,a2,30.575,31.626
+Punjab,a3,30.248,30.348
+Rajasthan,a1,21.862,22.473
+Rajasthan,a2,25.1,28.39
+Rajasthan,a3,24.232,24.532
+Telangana,a1,15.072,15.422
+Telangana,a2,16.965,18.745
+Telangana,a3,16.485,16.535
+Uttar Pradesh,a1,22.98,23.52
+Uttar Pradesh,a2,25.798,28.778
+Uttar Pradesh,a3,25.18,25.23
+Uttarakhand,a1,28.043,28.285
+Uttarakhand,a2,29.296,30.64
+Uttarakhand,a3,29.027,29.047
+Andaman and Nicobar Islands,a1,4.949775,5.621123
+Andaman and Nicobar Islands,a2,8.624047,11.97055
+Andaman and Nicobar Islands,a3,7.574255,7.852272
+Kerala,a1,7.63339,7.998502
+Kerala,a2,9.631643,11.45164
+Kerala,a3,9.060714,9.211913
+Lakshadweep,a1,7.129187,7.518135
+Lakshadweep,a2,9.257893,11.1967
+Lakshadweep,a3,8.649691,8.810762
+Chhattisgarh,a1,17.096,17.567
+Chhattisgarh,a2,19.6,22.1
+Chhattisgarh,a3,19.02,19.05
+Dadra and Nagar Haveli,a1,19.3715,19.436
+Dadra and Nagar Haveli,a2,19.714,20.055
+Dadra and Nagar Haveli,a3,19.6365,19.637
+Haryana,a1,27.6035,27.827
+Haryana,a2,28.75,30.01
+Haryana,a3,28.51252,28.53252
+Karnataka,a1,10.678,11.218
+Karnataka,a2,13.61,16.375
+Karnataka,a3,12.908,12.9083
+Manipur,a1,23.795,23.9212
+Manipur,a2,24.458,25.145
+Manipur,a3,24.315,24.3152
+Mizoram,a1,21.958,22.132
+Mizoram,a2,22.88,23.81
+Mizoram,a3,22.674,22.676
+Sikkim,a1,26.9965,27.068
+Sikkim,a2,27.365,27.765
+Sikkim,a3,27.2895,27.2915
+Tripura,a1,22.834,22.945
+Tripura,a2,23.416,24.01
+Tripura,a3,23.289,23.2891
+West Bengal,a1,20.774,21.216
+West Bengal,a2,23.092,25.492
+West Bengal,a3,22.582,22.602

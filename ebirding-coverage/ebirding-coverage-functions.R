@@ -179,49 +179,21 @@ plot_lims <- function(){
 
 annot_lims <- function(){
   
-  if (xextent1 > yextent1) {
-    
-    ext_ratio <- yextent1/xextent1
-    
-    ymid <- (ylimit[1] + ylimit[2])/2
-    
-    a1 <- data.frame(xmin = xlimit[1] - (28.5/29.5)*(xextent2),
-                     xmax = (xlimit[1] - (28.5/29.5)*(xextent2)) + (6.6/29.5)*xextent2,
-                     ymin = 25.5,
-                     ymax = 23.8) 
-    
-    # the text in the box, due to hjust = 0, will start from middle of x axis limits
-    # hence need to adjust xmin accordingly, so that the logo and this text line up
-    a2 <- data.frame(xmin = a1$xmin - (13/29.5)*xextent2,
-                     xmax = a1$xmin + (13/29.5)*xextent2,
-                     ymin = a1$ymin + (12.64/31.5)*yextent2, # diff. in ymins of logo and text is 14 originally
-                     ymax = (a1$ymin + (12.64/31.5)*yextent2) + ((13/29.5)*xextent2)/1.08) # 1.08 is aspect ratio 
-    
-    a3 <- data.frame(xmin = a1$xmin - (13/29.5)*xextent2,
-                     xmax = a1$xmin + (13/29.5)*xextent2,
-                     ymin = a1$ymin + (9.24/31.25)*yextent2, # diff. in ymins of logo and text is 10 originally
-                     ymax = (a1$ymin + (9.24/31.25)*yextent2) + ((13/29.5)*xextent2)/13) # 13 is aspect ratio 
-    
-  } else if (yextent1 > xextent1) {
-    
-    a1 <- data.frame(xmin = xlimit[1] - (28.5/29.5)*(xextent2),
-                     xmax = (xlimit[1] - (28.5/29.5)*(xextent2)) + (6.6/29.5)*xextent2,
-                     ymin = ylimit[1] - 0.15*yextent1,
-                     ymax = (ylimit[1] - 0.15*yextent1) + ((8.5/29.5)*xextent2)/3.52) # 3.52 is aspect ratio for logo
-    
-    # the text in the box, due to hjust = 0, will start from middle of x axis limits
-    # hence need to adjust xmin accordingly, so that the logo and this text line up
-    a2 <- data.frame(xmin = a1$xmin - (13/29.5)*xextent2,
-                     xmax = a1$xmin + (13/29.5)*xextent2,
-                     ymin = a1$ymin + (14/31.25)*yextent1, # diff. in ymins of logo and text is 14 originally
-                     ymax = (a1$ymin + (14/31.25)*yextent1) + ((13/29.5)*xextent2)/1.08) # 1.08 is aspect ratio 
-    
-    a3 <- data.frame(xmin = a1$xmin - (13/29.5)*xextent2,
-                     xmax = a1$xmin + (13/29.5)*xextent2,
-                     ymin = a1$ymin + (10/31.25)*yextent1, # diff. in ymins of logo and text is 10 originally
-                     ymax = (a1$ymin + (10/31.25)*yextent1) + ((13/29.5)*xextent2)/13) # 13 is aspect ratio 
-    
-  }
+  annot_lims_y <- read_csv("ebirding-coverage/annot_lims_config.csv") %>% 
+    filter(STATE == cur_state)
+  
+  annot_lims_x <- data.frame(NO = c("a1", "a2", "a3"),
+                             xmin = c(xlimit[1] - (28.5/29.5)*(xextent2),
+                                      (xlimit[1] - (28.5/29.5)*(xextent2)) - (13/29.5)*xextent2,
+                                      (xlimit[1] - (28.5/29.5)*(xextent2)) - (13/29.5)*xextent2),
+                             xmax = c((xlimit[1] - (28.5/29.5)*(xextent2)) + (6.6/29.5)*xextent2,
+                                      (xlimit[1] - (28.5/29.5)*(xextent2)) + (13/29.5)*xextent2,
+                                      (xlimit[1] - (28.5/29.5)*(xextent2)) + (13/29.5)*xextent2))
+  
+  a1 <- annot_lims_y %>% left_join(annot_lims_x) %>% filter(NO == "a1")
+  a2 <- annot_lims_y %>% left_join(annot_lims_x) %>% filter(NO == "a2")
+  a3 <- annot_lims_y %>% left_join(annot_lims_x) %>% filter(NO == "a3")
+  
   
   assign("a1", a1, envir = .GlobalEnv)
   assign("a2", a2, envir = .GlobalEnv)

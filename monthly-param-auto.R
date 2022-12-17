@@ -50,14 +50,14 @@ pmpdatapath <- glue("EBD/pmp_rel{rel_month_lab}-{rel_year}.RData")
 mcdatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_{toupper(rel_month_lab)}.RData")
 
 # for country
-coveragedatapath <- glue("ebirding-coverage/data/coverage_rel{rel_month_lab}-{rel_year}_IN.csv")
-coveragemappath1 <- glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_IN_annot.png")
-coveragemappath2 <- glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_IN_plain.png")
+coveragedatapath <- glue("ebirding-coverage/data/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN.csv")
+coveragemappath1 <- glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN_annot.png")
+coveragemappath2 <- glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN_plain.png")
 
 # for states
 state_info <- read_csv("ebirding-coverage/state_info.csv")
 
 coveragepaths_st <- state_info %>% 
-  mutate(DATA = glue("ebirding-coverage/data/coverage_rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}.csv"),
-         MAP1 = glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}_annot.png"),
-         MAP2 = glue("ebirding-coverage/maps/coverage_rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}_plain.png"))
+  mutate(DATA = glue("ebirding-coverage/data/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}.csv"),
+         MAP1 = glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}_annot.png"),
+         MAP2 = glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}_plain.png"))
