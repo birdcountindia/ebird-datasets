@@ -143,17 +143,21 @@ cov_stats <- function(data, scale, state_info)
 
 #### decide plot limits ####
 
-plot_lims <- function(axis){
+plot_lims <- function(){
   
   xextent1 <- cur_bbox[3] - cur_bbox[1]
   yextent1 <- cur_bbox[4] - cur_bbox[2]
   
   if (xextent1 > yextent1) {
+    ext_diff <- xextent1 - yextent1
+    
     xlimit <- c(cur_bbox[1], cur_bbox[3])
-    ylimit <- c(cur_bbox[2], cur_bbox[2] + xextent1)
+    ylimit <- c((cur_bbox[2] - ext_diff/2), (cur_bbox[4] + ext_diff/2))
   } 
   if (yextent1 > xextent1) {
-    xlimit <- c(cur_bbox[1], cur_bbox[1] + yextent1)
+    ext_diff <- yextent1 - xextent1
+    
+    xlimit <- c((cur_bbox[1] - ext_diff/2), (cur_bbox[3] + ext_diff/2))
     ylimit <- c(cur_bbox[2], cur_bbox[4])
   }
   
@@ -170,3 +174,58 @@ plot_lims <- function(axis){
   assign("ylimit", ylimit, envir = .GlobalEnv)
   
 }
+
+#### decide annotation limits ####
+
+annot_lims <- function(){
+  
+  if (xextent1 > yextent1) {
+    
+    ext_ratio <- yextent1/xextent1
+    
+    ymid <- (ylimit[1] + ylimit[2])/2
+    
+    a1 <- data.frame(xmin = xlimit[1] - (28.5/29.5)*(xextent2),
+                     xmax = (xlimit[1] - (28.5/29.5)*(xextent2)) + (6.6/29.5)*xextent2,
+                     ymin = 25.5,
+                     ymax = 23.8) 
+    
+    # the text in the box, due to hjust = 0, will start from middle of x axis limits
+    # hence need to adjust xmin accordingly, so that the logo and this text line up
+    a2 <- data.frame(xmin = a1$xmin - (13/29.5)*xextent2,
+                     xmax = a1$xmin + (13/29.5)*xextent2,
+                     ymin = a1$ymin + (12.64/31.5)*yextent2, # diff. in ymins of logo and text is 14 originally
+                     ymax = (a1$ymin + (12.64/31.5)*yextent2) + ((13/29.5)*xextent2)/1.08) # 1.08 is aspect ratio 
+    
+    a3 <- data.frame(xmin = a1$xmin - (13/29.5)*xextent2,
+                     xmax = a1$xmin + (13/29.5)*xextent2,
+                     ymin = a1$ymin + (9.24/31.25)*yextent2, # diff. in ymins of logo and text is 10 originally
+                     ymax = (a1$ymin + (9.24/31.25)*yextent2) + ((13/29.5)*xextent2)/13) # 13 is aspect ratio 
+    
+  } else if (yextent1 > xextent1) {
+    
+    a1 <- data.frame(xmin = xlimit[1] - (28.5/29.5)*(xextent2),
+                     xmax = (xlimit[1] - (28.5/29.5)*(xextent2)) + (6.6/29.5)*xextent2,
+                     ymin = ylimit[1] - 0.15*yextent1,
+                     ymax = (ylimit[1] - 0.15*yextent1) + ((8.5/29.5)*xextent2)/3.52) # 3.52 is aspect ratio for logo
+    
+    # the text in the box, due to hjust = 0, will start from middle of x axis limits
+    # hence need to adjust xmin accordingly, so that the logo and this text line up
+    a2 <- data.frame(xmin = a1$xmin - (13/29.5)*xextent2,
+                     xmax = a1$xmin + (13/29.5)*xextent2,
+                     ymin = a1$ymin + (14/31.25)*yextent1, # diff. in ymins of logo and text is 14 originally
+                     ymax = (a1$ymin + (14/31.25)*yextent1) + ((13/29.5)*xextent2)/1.08) # 1.08 is aspect ratio 
+    
+    a3 <- data.frame(xmin = a1$xmin - (13/29.5)*xextent2,
+                     xmax = a1$xmin + (13/29.5)*xextent2,
+                     ymin = a1$ymin + (10/31.25)*yextent1, # diff. in ymins of logo and text is 10 originally
+                     ymax = (a1$ymin + (10/31.25)*yextent1) + ((13/29.5)*xextent2)/13) # 13 is aspect ratio 
+    
+  }
+  
+  assign("a1", a1, envir = .GlobalEnv)
+  assign("a2", a2, envir = .GlobalEnv)
+  assign("a3", a3, envir = .GlobalEnv)
+  
+}
+
