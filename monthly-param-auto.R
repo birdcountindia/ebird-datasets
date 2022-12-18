@@ -58,6 +58,18 @@ coveragemappath2 <- glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{
 state_info <- read_csv("ebirding-coverage/state_info.csv")
 
 coveragepaths_st <- state_info %>% 
-  mutate(DATA = glue("ebirding-coverage/data/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}.csv"),
-         MAP1 = glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}_annot.png"),
-         MAP2 = glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}_plain.png"))
+  # paths without file names
+  mutate(PATH.DATA = glue("ebirding-coverage/data/{rel_year}-{rel_month_num}/"),
+         PATH.MAPS = glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/")) %>% 
+  mutate(DATA = glue("{PATH.DATA}rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}.csv"),
+         MAP1 = glue("{PATH.MAPS}rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}_annot.png"),
+         MAP2 = glue("{PATH.MAPS}rel{rel_month_lab}-{rel_year}_IN-{STATE.CODE}_plain.png"))
+
+# creating folders if they don't exist
+if (!dir.exists(coveragepaths_st$PATH.DATA[1])) {
+  dir.create(coveragepaths_st$PATH.DATA[1])
+}
+
+if (!dir.exists(coveragepaths_st$PATH.MAPS[1])) {
+  dir.create(coveragepaths_st$PATH.MAPS[1])
+}

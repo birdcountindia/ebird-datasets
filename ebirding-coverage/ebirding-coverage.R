@@ -101,7 +101,7 @@ map_cov_annot <- ggplot() +
                     ymin = 15, ymax = 16,
                     xmin = 40, xmax = 53) 
 
-ggsave(map_cov_annot, file = coveragemappath1, 
+ggsave(coveragemappath1, map_cov_annot,  
        # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
        device = png,
        units = "in", width = 13, height = 9, bg = "transparent", dpi = 300)
@@ -131,12 +131,20 @@ map_cov_plain <- ggplot() +
         plot.title = element_text(hjust = 0.5)) +
   coord_map()
 
-ggsave(map_cov_plain, file = coveragemappath2, 
+ggsave(coveragemappath2, map_cov_plain, 
        # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
        device = png,
        units = "in", width = 8, height = 11, bg = "transparent", dpi = 300)
 
 print("Monthly coverage maps for India created.")
+
+
+#### uploading to GDrive ###
+
+# "put" overwrites/updates existing file whereas "upload" creates new files each time
+drive_put(coveragemappath1, 
+          path = as_id("16qhxEVi7POAHaeQs_z4u6-C9IoHdrd8T"),
+          name = "str_pad(0, width=2, pad='0') India.png")
 
 #### creating monthly coverage stats for states ####
 
@@ -280,5 +288,15 @@ for (i in unique(state_info$STATE)) {
          units = "in", width = 8, height = 8, bg = "black", dpi = 300)
   
   print(glue("Monthly coverage maps for {cur_state} ({count}/37) created."))
+  
+  #### uploading to GDrive ###
+
+  # "put" overwrites/updates existing file whereas "upload" creates new files each time
+  drive_put(coveragemappath1, 
+            path = as_id("16qhxEVi7POAHaeQs_z4u6-C9IoHdrd8T"),
+            name = glue("{str_pad(count, width=2, pad='0')} {cur_state}.png"))
+  
+  print(glue("Monthly coverage maps for {cur_state} ({count}/37) uploaded to GDrive."))
+  
 }
 tictoc::toc()

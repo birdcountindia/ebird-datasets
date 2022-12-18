@@ -53,6 +53,11 @@ preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DAT
 # (only works when using new rel. data in the month it comes out, e.g., working with relJun in July)
 source("monthly-param-auto.R")
 
+#### authenticating GDrive for upload of coverage ####
+
+drive_auth(email = "birdcountindia@ncf-india.org")
+gs4_auth(email = "birdcountindia@ncf-india.org")
+
 
 #### unzipping EBD download (if not done already) ####
 
@@ -170,18 +175,3 @@ source("BCI-metrics/ebdMetrics.R")
 #### generating monthly coverage stats and maps ####
 
 source("ebirding-coverage/ebirding-coverage.R")
-
-#### uploading to GDrive ####
-
-drive_auth(email = "birdcountindia@gmail.com")
-gs4_auth(email = "birdcountindia@gmail.com")
-
-# overwrites existing ss
-sheet_write(data_cov2, 
-            sheet = "data_cov2",
-            ss = "https://docs.google.com/spreadsheets/d/1EAMiznrLPe4yZ47GIfItl2m4KucZ--RkkLFqRSfm_ts/")
-
-# "put" overwrites/updates existing file whereas "upload" creates new files each time
-drive_put(coveragemappath1, "ebirding-coverage/maps/ebirding-coverage_annot.png")
-drive_put(coveragemappath2, "ebirding-coverage/maps/ebirding-coverage_plain.png")
-
