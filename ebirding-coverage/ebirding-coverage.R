@@ -9,6 +9,10 @@ require(glue)
 require(sf)
 
 # converting spdf to sf
+indiamap_sf <- indiamap %>% 
+  st_as_sf() %>% 
+  dplyr::select(-DISTRICT) 
+
 statemap_sf <- statemap %>% 
   st_as_sf() %>% 
   dplyr::select(ST_NM, geometry) %>% 
@@ -62,15 +66,15 @@ map_cov_footer <- glue::glue("Data until {rel_month_lab} {rel_year}")
 
 data_loc <- data %>% distinct(LONGITUDE, LATITUDE)
 
+cur_bbox <- data_loc %>% st_as_sf(coords = c("LONGITUDE", "LATITUDE")) %>% st_bbox()
+plot_lims()
+
 
 ### map with annotations of stats and BCI logo ###
 map_cov_annot <- ggplot() +
-  geom_polygon(data = indiamap, aes(x = long, y = lat, group = group), 
-               colour = NA, fill = "black")+
-  geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
+  geom_sf(data = indiamap_sf, colour = NA, fill = "black") +
+  geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE),
              colour = "#fcfa53", size = 0.05, stroke = 0) +
-  # scale_x_continuous(expand = c(0,0)) +
-  # scale_y_continuous(expand = c(0,0)) +
   theme_bw() +
   theme(axis.line = element_blank(),
         axis.text.x = element_blank(),
@@ -81,39 +85,36 @@ map_cov_annot <- ggplot() +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
-        # panel.border = element_blank(),
         plot.background = element_rect(fill = "black", colour = NA),
         panel.background = element_rect(fill = "black", colour = NA),
         plot.title = element_text(hjust = 0.5))+
-  coord_cartesian(clip = "off") +
-  theme(plot.margin = unit(c(2,2,0,23), "lines")) +
+  coord_sf(clip = "off", xlim = xlimit, ylim = ylimit) +
+  theme(plot.margin = unit(c(0,0,0,24), "lines")) +
   annotation_raster(map_cov_logo, 
-                    ymin = 4.5, ymax = 6.5,
-                    xmin = 46.5, xmax = 53.1) +
+                    ymin = -0.85, ymax = 1.8,
+                    xmin = 33.75, xmax = 41.0) +
   annotation_custom(textGrob(label = map_cov_text,
                              hjust = 0,
-                             gp = gpar(col = "#FCFA53", cex = 1.5)),
-                    ymin = 19, ymax = 31,
-                    xmin = 40, xmax = 53)  +
+                             gp = gpar(col = "#FCFA53", cex = 1.0)),
+                    ymin = 14, ymax = 29,
+                    xmin = 33.3, xmax = 34)  +
   annotation_custom(textGrob(label = map_cov_footer,
                              hjust = 0,
-                             gp = gpar(col = "#D2D5DA", cex = 1.0)),
-                    ymin = 15, ymax = 16,
-                    xmin = 40, xmax = 53) 
+                             gp = gpar(col = "#D2D5DA", cex = 0.7)),
+                    ymin = 11.29, ymax = 11.3,
+                    xmin = 33.3, xmax = 34) 
 
 ggsave(coveragemappath1, map_cov_annot,  
        # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
        device = png,
-       units = "in", width = 13, height = 9, bg = "transparent", dpi = 300)
+       units = "in", width = 10, height = 7, bg = "black", dpi = 300)
+
 
 ### plain map without annotations ###
 map_cov_plain <- ggplot() +
-  geom_polygon(data = indiamap, aes(x = long, y = lat, group = group), 
-               colour = NA, fill = "black")+
+  geom_sf(data = indiamap_sf, colour = NA, fill = "black") +
   geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
-             colour = "#fcfa53", size = 0.05, stroke = 0.1) +
-  # scale_x_continuous(expand = c(0,0)) +
-  # scale_y_continuous(expand = c(0,0)) +
+             colour = "#fcfa53", size = 0.05, stroke = 0) +
   theme_bw() +
   theme(axis.line = element_blank(),
         axis.text.x = element_blank(),
@@ -124,17 +125,16 @@ map_cov_plain <- ggplot() +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
-        plot.margin = unit(c(0, 0, 0, 0), "cm"),
-        # panel.border = element_blank(),
+        plot.margin = unit(c(0.75, 0.75, 0.75, 0.75), "lines"),
         plot.background = element_rect(fill = "black", colour = NA),
         panel.background = element_rect(fill = "black", colour = NA),
         plot.title = element_text(hjust = 0.5)) +
-  coord_map()
+  coord_sf(clip = "off", xlim = xlimit, ylim = ylimit) 
 
 ggsave(coveragemappath2, map_cov_plain, 
        # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
        device = png,
-       units = "in", width = 8, height = 11, bg = "transparent", dpi = 300)
+       units = "in", width = 8, height = 8, bg = "black", dpi = 300)
 
 print("Monthly coverage maps for India created.")
 
@@ -282,7 +282,7 @@ for (i in unique(state_info$STATE)) {
     coord_sf(clip = "off", xlim = xlimit, ylim = ylimit) 
 
     
-  ggsave(map_cov_plain, file = coveragemappath2, 
+  ggsave(coveragemappath2, map_cov_plain, 
          # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
          device = png,
          units = "in", width = 8, height = 8, bg = "black", dpi = 300)
