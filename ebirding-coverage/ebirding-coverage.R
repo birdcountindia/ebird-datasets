@@ -144,7 +144,7 @@ print("Monthly coverage maps for India created.")
 # "put" overwrites/updates existing file whereas "upload" creates new files each time
 drive_put(coveragemappath1, 
           path = as_id("16qhxEVi7POAHaeQs_z4u6-C9IoHdrd8T"),
-          name = "str_pad(0, width=2, pad='0') India.png")
+          name = glue("{str_pad(0, width=2, pad='0')} India.png"))
 
 #### creating monthly coverage stats for states ####
 

@@ -26,6 +26,6 @@ EBD/db/
 BCI-metrics/token.R
 
 ebirding-coverage/*.csv
-ebirding-coverage/*.png
+ebirding-coverage/maps/
 
 
