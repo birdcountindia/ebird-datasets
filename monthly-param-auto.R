@@ -55,7 +55,7 @@ coveragemappath1 <- glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{
 coveragemappath2 <- glue("ebirding-coverage/maps/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN_plain.png")
 
 # for states
-state_info <- read_csv("ebirding-coverage/state_info.csv")
+state_info <- read_csv("ebirding-coverage/state_info.csv", show_col_types = F)
 
 coveragepaths_st <- state_info %>% 
   # paths without file names

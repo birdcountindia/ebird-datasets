@@ -37,7 +37,7 @@ cov_stats <- function(data, scale, state_info)
       summarise(HOURS = floor(sum(DURATION.MINUTES)/60))
     
     ### people ###
-    groupaccs <- read_csv(groupaccspath) %>% 
+    groupaccs <- read_csv(groupaccspath, show_col_types = F) %>% 
       mutate(CATEGORY = case_when(GA.1 == 1 ~ "GA.1", 
                                   GA.2 == 1 ~ "GA.2", 
                                   TRUE ~ "NG"))
@@ -99,7 +99,7 @@ cov_stats <- function(data, scale, state_info)
       summarise(HOURS = floor(sum(DURATION.MINUTES)/60))
     
     ### people ###
-    groupaccs <- read_csv(groupaccspath) %>% 
+    groupaccs <- read_csv(groupaccspath, show_col_types = F) %>% 
       mutate(CATEGORY = case_when(GA.1 == 1 ~ "GA.1", 
                                   GA.2 == 1 ~ "GA.2", 
                                   TRUE ~ "NG"))
@@ -179,7 +179,7 @@ plot_lims <- function(){
 
 annot_lims <- function(){
   
-  annot_lims_y <- read_csv("ebirding-coverage/annot_lims_config.csv") %>% 
+  annot_lims_y <- read_csv("ebirding-coverage/annot_lims_config.csv", show_col_types = F) %>% 
     filter(STATE == cur_state)
   
   annot_lims_x <- data.frame(NO = c("a1", "a2", "a3"),
