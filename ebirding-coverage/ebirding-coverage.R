@@ -192,6 +192,8 @@ for (i in unique(state_info$STATE)) {
   
   data_cov_state <- filter(data_cov, STATE == cur_state)
   
+  plural_districts <- ifelse(data_cov_state$DISTRICTS == 1, "district", "districts")
+
   
   map_cov_logo <- image_convert(image_read("bcilogo-framed.png"), matte = T)
   
@@ -202,7 +204,7 @@ for (i in unique(state_info$STATE)) {
                              {label_comma()(data_cov_state$HOURS)} hours
                              {label_comma()(data_cov_state$PEOPLE)} people
                              
-                             {label_comma()(data_cov_state$DISTRICTS)} districts
+                             {label_comma()(data_cov_state$DISTRICTS)} {plural_districts}
                              
                              {label_comma()(data_cov_state$SPECIES)} species
                              {label_comma()(data_cov_state$OBSERVATIONS)} observations")
