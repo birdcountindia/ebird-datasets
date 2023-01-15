@@ -48,6 +48,7 @@ maindatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}.RData")
 slicedatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_slice.RData")
 pmpdatapath <- glue("EBD/pmp_rel{rel_month_lab}-{rel_year}.RData")
 mcdatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_{toupper(rel_month_lab)}.RData")
+ycdatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_{rel_year}.RData")
 
 # for country
 coveragedatapath <- glue("ebirding-coverage/data/{rel_year}-{rel_month_num}/rel{rel_month_lab}-{rel_year}_IN.csv")

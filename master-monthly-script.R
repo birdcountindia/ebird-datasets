@@ -166,6 +166,20 @@ rm(.Random.seed)
 save(data_mc, file = mcdatapath)
 
 
+
+#### filtering for yearly challenge (only for January) ####
+
+if (cur_month_num == 1) {
+  
+  data_yc <- data %>% filter(YEAR == rel_year)
+  
+  save(data_yc, file = ycdatapath)
+  
+} else {
+  print("Quitting from filtering for yearly challenge.")
+}
+
+
 #### generating PJ's monthly metrics out of EBD ####
 
 print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
