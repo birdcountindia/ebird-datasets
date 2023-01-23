@@ -143,7 +143,7 @@ if (exists("data_slice_S")) {
 
 #### filtering for PMP (only for alternate months) ####
 
-pmp_months <- seq(1, 12, by = 2) # odd months
+pmp_months <- seq(1, 12, by = 6) # Jan and Jul
 
 if (cur_month_num %in% pmp_months) {
   
