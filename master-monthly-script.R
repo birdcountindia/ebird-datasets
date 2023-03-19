@@ -29,8 +29,8 @@ library(googlesheets4)
 # but will stay same for a number of months at a time
 
 # update when latest available
-senspath <- "EBD/ebd_sensitive_relMay-2022_IN.txt" 
-groupaccspath <- "group-accounts/ebd_users_GA_relMay-2022.csv"
+senspath <- "EBD/ebd_sensitive_relFeb-2023_IN.txt" 
+groupaccspath <- "group-accounts/ebd_users_GA_relFeb-2023.csv"
 
 dataset_str <- "ebd_IN_prv_rel" # or "ebd_IN_rel" if no unvetted data
 
