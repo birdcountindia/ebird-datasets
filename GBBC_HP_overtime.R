@@ -1,5 +1,6 @@
 library(tidyverse)
 library(writexl)
+library(sf)
 
 
 senspath <- "EBD/ebd_sensitive_relFeb-2023_IN.txt" 
@@ -33,7 +34,7 @@ summary <- data0 %>%
   basic_stats(pipeline = T, prettify = F)
 
 
-# top 5 common species, over time
+# top 5 common species, over time -----------------------------------------
 
 comm_spec <- data0 %>% 
   group_by(YEAR) %>% 
@@ -51,3 +52,46 @@ write_xlsx(x = list("Stats" = summary,
                     "Common species" = comm_spec),
            path = "GBBC_HP_overtime.xlsx")
   
+
+# districtwise stats on interactive map -----------------------------------
+
+load("../india-maps/outputs/maps_sf.RData")
+
+cur_dists_sf <- dists_sf %>% filter(STATE.NAME == "Himachal Pradesh")
+
+dist_stats <- data0 %>% 
+  # joining map vars to EBD
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), remove = F) %>% 
+  st_set_crs(st_crs(dists_sf)) %>% 
+  st_join(dists_sf %>% dplyr::select(-STATE.NAME, -AREA)) %>% 
+  st_drop_geometry() %>% 
+  group_by(YEAR, DISTRICT.NAME) %>% 
+  basic_stats(pipeline = T, prettify = F) %>% 
+  ungroup() %>% 
+  # keeping only necessary
+  dplyr::select(YEAR, DISTRICT.NAME, SPECIES, LISTS.ALL, PARTICIPANTS, LOCATIONS) %>% 
+  complete(YEAR = 2014:2023, 
+           DISTRICT.NAME = cur_dists_sf$DISTRICT.NAME, 
+           fill = list(SPECIES = 0,
+                       LISTS.ALL = 0,
+                       PARTICIPANTS = 0,
+                       LOCATIONS = 0)) %>% 
+  ungroup() %>% 
+  right_join(cur_dists_sf %>% dplyr::select(-AREA)) %>% 
+  st_as_sf()
+
+map_dist_stats <- ggplot(dist_stats) + 
+  geom_sf(aes(fill = LISTS.ALL)) +
+  facet_wrap(~ YEAR, ncol = 5) +
+  scale_fill_viridis_b(breaks = c(5, 10, 25, 50, 100), 
+                       values = scales::rescale(c(0, 5, 10, 25, 50, 100, 150)),
+                       limits = c(0, 150),
+                       begin = 0, end = 1,
+                       name = "Total\nlists") + 
+  theme_classic() + 
+  theme(axis.text = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank())
+
+ggsave(map_dist_stats, filename = "GBBC_HP_overtime_disteffortmap.png",
+       dpi = 300, width = 12, height = 6, units = "in")
