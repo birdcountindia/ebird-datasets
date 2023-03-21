@@ -80,7 +80,7 @@ dist_stats <- data0 %>%
   right_join(cur_dists_sf %>% dplyr::select(-AREA)) %>% 
   st_as_sf()
 
-map_dist_stats <- ggplot(dist_stats) + 
+map_dist_stats_lists <- ggplot(dist_stats) + 
   geom_sf(aes(fill = LISTS.ALL)) +
   facet_wrap(~ YEAR, ncol = 5) +
   scale_fill_viridis_b(breaks = c(5, 10, 25, 50, 100), 
@@ -93,5 +93,37 @@ map_dist_stats <- ggplot(dist_stats) +
         axis.line = element_blank(),
         axis.ticks = element_blank())
 
-ggsave(map_dist_stats, filename = "GBBC_HP_overtime_disteffortmap.png",
+ggsave(map_dist_stats_lists, filename = "GBBC_HP_overtime_disteffortmap_lists.png",
+       dpi = 300, width = 12, height = 6, units = "in")
+
+map_dist_stats_obs <- ggplot(dist_stats) + 
+  geom_sf(aes(fill = PARTICIPANTS)) +
+  facet_wrap(~ YEAR, ncol = 5) +
+  scale_fill_viridis_b(breaks = c(2, 5, 10, 20), 
+                       values = scales::rescale(c(0, 2, 5, 10, 20, 50)),
+                       limits = c(0, 50),
+                       begin = 0, end = 1,
+                       name = "Total\nparticipants") + 
+  theme_classic() + 
+  theme(axis.text = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank())
+
+ggsave(map_dist_stats_obs, filename = "GBBC_HP_overtime_disteffortmap_obs.png",
+       dpi = 300, width = 12, height = 6, units = "in")
+
+map_dist_stats_spec <- ggplot(dist_stats) + 
+  geom_sf(aes(fill = SPECIES)) +
+  facet_wrap(~ YEAR, ncol = 5) +
+  scale_fill_viridis_b(breaks = c(10, 50, 100, 150), 
+                       values = scales::rescale(c(0, 10, 50, 100, 150, 250)),
+                       limits = c(0, 250),
+                       begin = 0, end = 1,
+                       name = "Total\nspecies") + 
+  theme_classic() + 
+  theme(axis.text = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank())
+
+ggsave(map_dist_stats_spec, filename = "GBBC_HP_overtime_disteffortmap_spec.png",
        dpi = 300, width = 12, height = 6, units = "in")
