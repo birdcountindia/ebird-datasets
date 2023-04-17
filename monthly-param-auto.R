@@ -9,14 +9,14 @@ require(glue)
 # to make code robust against (day == 31) in which case the other lines produce NA:
 
 # date under consideration for current leaderboard
-cur_date <- if (today() %>% day() == 31) { 
-  (today() - days(1)) %>% floor_date(unit = "month")
+cur_date <- if (today() %>% day() < 16) { 
+  (today() - months(1)) %>% floor_date(unit = "month")
 } else {
   today() %>% floor_date(unit = "month")
 }
 
-rel_date <- if (today() %>% day() == 31) {
-  ((today() - days(1)) - months(1)) %>%
+rel_date <- if (today() %>% day() < 16) {
+  ((today() - months(1)) - months(1)) %>%
     floor_date(unit = "month")
 } else {
   (today() - months(1)) %>%
