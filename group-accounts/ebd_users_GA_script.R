@@ -6,8 +6,8 @@ library(glue)
 
 #### variable parameters (update manually) ####
 
-userspath <- "EBD/ebd_users_relMay-2022.txt"
-prev_gapath <- "group-accounts/ebd_users_GA_relMar-2022.csv"
+userspath <- "EBD/ebd_users_relFeb-2023.txt"
+prev_gapath <- "group-accounts/ebd_users_GA_relMay-2022.csv"
 
 dataset_str <- "ebd_IN_prv_rel" # or "ebd_IN_rel" if no unvetted data
 
@@ -77,7 +77,7 @@ if (file.exists(userspath) & !file.exists(groupaccspath)) {
                 "trust","ollect","Monitor","monitor")
   
   # other group accounts without keywords in name
-  accounts <- c("GBCN Goa") 
+  accounts <- c("GBCN Goa", "Dolphin Bengaluru", "obsr1288653") # same Dolphin but ID 
   
   data1 <- data0 %>% 
     filter(str_detect(FULL.NAME, paste(keywords, collapse = "|")) |
