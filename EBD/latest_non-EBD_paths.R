@@ -29,4 +29,5 @@ groupaccspath <- glue("group-accounts/ebd_users_GA_rel{latestusersrel}.csv")
 senspath <- glue("EBD/ebd_sensitive_rel{latestsensrel}.txt")
 
 save(userspath, senspath, groupaccspath,
+     latestusersrel, latestsensrel,
      file = "EBD/latest_non-EBD_paths.RData")

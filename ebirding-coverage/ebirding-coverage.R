@@ -1,29 +1,12 @@
 require(tidyverse)
 
 # Required for maps:
-load("maps.RData")
+load("../india-maps/outputs/maps_sf.RData")
 require(magick)
 require(scales) # for comma format of numbers
 require(grid)
 require(glue)
 require(sf)
-
-# converting spdf to sf
-indiamap_sf <- indiamap %>% 
-  st_as_sf() %>% 
-  dplyr::select(-DISTRICT) 
-
-statemap_sf <- statemap %>% 
-  st_as_sf() %>% 
-  dplyr::select(ST_NM, geometry) %>% 
-  magrittr::set_colnames(c("STATE", "geometry")) %>% 
-  mutate(STATE = str_to_title(STATE)) %>% 
-  # replacing ampersand with "and"
-  mutate(STATE = str_replace(STATE, "&", "and")) %>% 
-  # corrections for Madhu's SPDF values
-  mutate(STATE = case_when(STATE == "Dadra and Nagar Have" ~ "Dadra and Nagar Haveli",
-                           STATE == "Andaman and Nicobar" ~ "Andaman and Nicobar Islands",
-                           TRUE ~ STATE))
 
 source("ebirding-coverage/ebirding-coverage-functions.R")
 
@@ -72,7 +55,7 @@ plot_lims()
 
 ### map with annotations of stats and BCI logo ###
 map_cov_annot <- ggplot() +
-  geom_sf(data = indiamap_sf, colour = NA, fill = "black") +
+  geom_sf(data = india_sf, colour = NA, fill = "black") +
   geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE),
              colour = "#fcfa53", size = 0.05, stroke = 0) +
   theme_bw() +
@@ -112,7 +95,7 @@ ggsave(coveragemappath1, map_cov_annot,
 
 ### plain map without annotations ###
 map_cov_plain <- ggplot() +
-  geom_sf(data = indiamap_sf, colour = NA, fill = "black") +
+  geom_sf(data = india_sf, colour = NA, fill = "black") +
   geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
              colour = "#fcfa53", size = 0.05, stroke = 0) +
   theme_bw() +
@@ -221,7 +204,7 @@ for (i in unique(state_info$STATE)) {
   
   ### map with annotations of stats and BCI logo ###
   map_cov_annot <- ggplot() +
-    geom_sf(data = filter(statemap_sf, STATE == cur_state),
+    geom_sf(data = filter(states_sf, STATE.NAME == cur_state),
             colour = NA, fill = "black") +
     geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE),
                colour = "#fcfa53", size = 0.05, stroke = 0) +
@@ -262,7 +245,7 @@ for (i in unique(state_info$STATE)) {
   
   ### plain map without annotations ###
   map_cov_plain <- ggplot() +
-    geom_sf(data = filter(statemap_sf, STATE == cur_state),
+    geom_sf(data = filter(states_sf, STATE.NAME == cur_state),
             colour = NA, fill = "black") +
     geom_point(data = data_loc, aes(x = LONGITUDE, y = LATITUDE), 
                colour = "#fcfa53", size = 0.05, stroke = 0) +
