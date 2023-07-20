@@ -6,8 +6,8 @@ library(glue)
 
 #### variable parameters (update manually) ####
 
-userspath <- "EBD/ebd_users_relFeb-2023.txt"
-prev_gapath <- "group-accounts/ebd_users_GA_relMay-2022.csv"
+source("EBD/latest_non-EBD_paths.R")
+prev_gapath <- "group-accounts/ebd_users_GA_relFeb-2023.csv"
 
 dataset_str <- "ebd_IN_prv_rel" # or "ebd_IN_rel" if no unvetted data
 
