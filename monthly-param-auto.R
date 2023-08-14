@@ -33,16 +33,28 @@ rel_month_lab <- rel_date %>% month(label = T, abbr = T)
 
 
 # for PJ's metrics
+
+prevrel_date <- if (today() %>% day() < 16) {
+  ((today() - months(1)) - months(2)) %>%
+    floor_date(unit = "month")
+} else {
+  (today() - months(2)) %>%
+    floor_date(unit = "month")
+}
+PrevMonthNum <- prevrel_date %>% month()
+PrevMonthLab <- prevrel_date %>% month(label = T, abbr = T) 
+PrevYear <- prevrel_date %>% year()
+CurMonthLab <- rel_month_lab
 CurMonth <- rel_month_num
 CurYear <- rel_year
-PrevYear <- rel_year - 1
 Months <- seq((today() - months(6)), (today() - months(1)), by = "month") %>% month()
+
+#
 
 
 zippath <- glue("EBD/{dataset_str}{rel_month_lab}-{rel_year}.zip")
 rawfile <- glue("{dataset_str}{rel_month_lab}-{rel_year}.txt")
 rawpath <- glue("EBD/{rawfile}")
-
 
 maindatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}.RData")
 slicedatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}_slice.RData")

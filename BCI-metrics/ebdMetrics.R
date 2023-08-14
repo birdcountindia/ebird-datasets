@@ -141,3 +141,11 @@ district_metrics <- genDistrictMetrics()
 write_csv(india_metrics, "BCI-metrics/india_metrics.csv")
 write_csv(state_metrics, "BCI-metrics/state_metrics.csv")
 write_csv(district_metrics, "BCI-metrics/district_metrics.csv")
+
+
+# uploading to GSheet
+source("BCI-metrics/gsheet_functions.R")
+
+write_metrics_sheet(district_metrics, "DT")
+write_metrics_sheet(state_metrics, "ST")
+write_metrics_sheet(india_metrics, "IN")
