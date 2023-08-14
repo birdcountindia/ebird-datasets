@@ -183,7 +183,7 @@ if (cur_month_num == 1) {
 
 #### generating PJ's monthly metrics out of EBD ####
 
-print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
+print(glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
 
 source("BCI-metrics/ebdMetrics.R")
 
