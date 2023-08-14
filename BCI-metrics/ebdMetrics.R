@@ -56,19 +56,7 @@ india_list_stats <- ebd %>%
   summarise(count = n_distinct(GROUP.ID)) %>%
   ungroup()
 
-india_media_list_stats <- ebd %>% 
-  filter(HAS.MEDIA == 1) %>%
-  group_by(YEAR, MONTH) %>%
-  summarise(count = n_distinct(GROUP.ID)) %>%
-  ungroup()
-
 india_user_stats <- ebd %>%
-  group_by(YEAR, MONTH) %>%
-  summarise(count = n_distinct(OBSERVER.ID)) %>%
-  ungroup()
-
-india_media_user_stats <- ebd %>%
-  filter(HAS.MEDIA == 1) %>%
   group_by(YEAR, MONTH) %>%
   summarise(count = n_distinct(OBSERVER.ID)) %>%
   ungroup()
@@ -134,7 +122,6 @@ accounting <- function (number)
 
 photo_stats <<- 0
 sound_stats <<- 0
-video_stats <<- 0
 source ("BCI-metrics/mediaMlMetrics.R")
 
 pullMediaStats()
@@ -142,7 +129,6 @@ pullMediaStats()
 # Move this to mediaMLMetrics later
 colnames(photo_stats) <- c("YEAR", "MONTH", "count")
 colnames(sound_stats) <- c("YEAR", "MONTH", "count")
-colnames(video_stats) <- c("YEAR", "MONTH", "count")
 
 source("BCI-metrics/indiaMetrics.R")
 source("BCI-metrics/stateMetrics.R")

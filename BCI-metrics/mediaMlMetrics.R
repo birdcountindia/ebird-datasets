@@ -113,9 +113,4 @@ pullMediaStats <- function()
                     as.data.frame()
   sound_stats <<-  sound_stats [, c(3, 2, 1)]
            
-  video_stats <<-  mediastat %>% 
-                    select ("video", "MONTH", "YEAR")  %>%
-                    lapply(as.integer) %>%
-                    as.data.frame()
-  video_stats <<-  video_stats [, c(3, 2, 1)]
 }        
