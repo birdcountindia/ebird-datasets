@@ -23,6 +23,9 @@ rel_date <- if (today() %>% day() < 16) {
     floor_date(unit = "month")
 }
 
+# cur_date <- "2023-08-01"
+# rel_date <- "2023-07-01"
+
 cur_year <- cur_date %>% year()
 cur_month_num <- cur_date %>% month()
 cur_month_lab <- cur_date %>% month(label = T, abbr = T)
@@ -36,7 +39,7 @@ rel_month_lab <- rel_date %>% month(label = T, abbr = T)
 CurMonth <- rel_month_num
 CurYear <- rel_year
 PrevYear <- rel_year - 1
-Months <- seq((today() - months(6)), (today() - months(1)), by = "month") %>% month()
+Months <- seq((as_date(cur_date) - months(6)), (as_date(cur_date) - months(1)), by = "month") %>% month()
 
 
 zippath <- glue("EBD/{dataset_str}{rel_month_lab}-{rel_year}.zip")
