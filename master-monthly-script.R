@@ -30,7 +30,7 @@ source("EBD/latest_non-EBD_paths.R")
 
 ### variable parameters ###
 
-dataset_str <- "ebd_IN_prv_rel" # or "ebd_IN_rel" if no unvetted data
+dataset_str <- "ebd_IN_unv_smp_rel" # or "ebd_IN_rel" if no unvetted data
 
 preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
             "LOCALITY.ID","LOCALITY.TYPE","REVIEWED","APPROVED","LAST.EDITED.DATE",
@@ -70,6 +70,18 @@ if (!file.exists(rawpath) & file.exists(zippath)) {
   print("Latest data download does not exist!")
 } else {
   print("Data download already unzipped.")
+}
+
+# SED
+if (dataset_str == "ebd_IN_unv_smp_rel") {
+  if (!file.exists(rawpath_sed) & file.exists(zippath)) {
+    unzip(zipfile = zippath, files = rawfile_sed, exdir = "EBD") # don't add trailing slash in path
+    print("Data download unzipped.")
+  } else if (!file.exists(rawpath_sed) & !file.exists(zippath)) {
+    print("Latest data download does not exist!")
+  } else {
+    print("Data download already unzipped.")
+  }
 }
 
 #### main data processing steps ####

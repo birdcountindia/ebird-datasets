@@ -45,6 +45,8 @@ Months <- seq((as_date(cur_date) - months(6)), (as_date(cur_date) - months(1)), 
 zippath <- glue("EBD/{dataset_str}{rel_month_lab}-{rel_year}.zip")
 rawfile <- glue("{dataset_str}{rel_month_lab}-{rel_year}.txt")
 rawpath <- glue("EBD/{rawfile}")
+rawfile_sed <- glue("{dataset_str}{rel_month_lab}-{rel_year}_sampling.txt")
+rawpath_sed <- glue("EBD/{rawfile_sed}")
 
 
 maindatapath <-  glue("EBD/ebd_IN_rel{rel_month_lab}-{rel_year}.RData")
