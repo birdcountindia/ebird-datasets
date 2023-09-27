@@ -63,6 +63,8 @@ genStateMetrics <- function()
                                "Users_PreMCurY",
                                "Users_CurMPreY")
   
+  state_metrics[is.na(state_metrics)] = 0
+  
   state_metrics <- state_metrics %>% 
     mutate(STATE.CODE   = substr(STATE.CODE,4,5),
            Obsv_Trend   = round(100 *(Obsv_CurMCurY - Obsv_CurMPreY)/Obsv_CurMPreY,0) %>% accounting(),
@@ -79,23 +81,13 @@ genStateMetrics <- function()
            Lists_Trend,
            Users_PreMCurY,
            Users_CurMCurY,
-           Users_Trend)
+           Users_Trend) %>% 
+    mutate(across(c(everything(), -STATE.CODE), ~ as.numeric(.))) %>% 
+    magrittr::set_colnames(c("", 
+                             month.abb[PrevMonth], month.abb[CurMonth], "YoY%",
+                             month.abb[PrevMonth], month.abb[CurMonth], "YoY%",
+                             month.abb[PrevMonth], month.abb[CurMonth], "YoY%"))
   
-  colnames(state_metrics) <- c(
-                                 "",
-                                 month.abb[PrevMonth],
-                                 month.abb[CurMonth],
-                                 "YoY%",
-                                 month.abb[PrevMonth],
-                                 month.abb[CurMonth],
-                                 "YoY%",
-                                 month.abb[PrevMonth],
-                                 month.abb[CurMonth],
-                                 "YoY%",
-                                 month.abb[PrevMonth],
-                                 month.abb[CurMonth],
-                                 "YoY%")
-  state_metrics[is.na(state_metrics)] = 0
   return(state_metrics)
 }
 #####################################################################

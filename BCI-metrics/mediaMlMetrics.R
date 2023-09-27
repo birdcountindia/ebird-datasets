@@ -61,7 +61,7 @@ getMediaSummary <- function (startMonth, endMonth, startYear, endYear)
                       "X-eBirdApiToken" = myEBirdToken)
     searchString <- paste0(searchURL, replaceSearchString (startMonth, endMonth, startYear, endYear)) 
     retries <- 0
-    while (retries < 3)
+    while (retries < 5)
     {
       req <- curl_fetch_memory(searchString, h)
       Sys.sleep(3)
@@ -95,11 +95,9 @@ pullMediaStats <- function()
   mediastat ['MONTH'] <- CurMonth
   mediastat ['YEAR']  <- PrevYear
 
-  monthstat <- mapply ( getMonthSummary, 
-                            Months) %>% 
-                           as.data.frame() 
-     
-  mediastat <- rbind (mediastat, t(monthstat))
+  monthstat <- map_df(Months, getMonthSummary)   
+  
+  mediastat <- rbind(mediastat, monthstat)
    
   photo_stats <<-  mediastat %>% 
                     select ("photo", "MONTH", "YEAR") %>%

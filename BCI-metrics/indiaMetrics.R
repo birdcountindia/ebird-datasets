@@ -60,7 +60,8 @@ genIndiaMetrics <- function ()
     addMetricRow(india_user_stats) %>%
     addMetricRow(india_new_users_stats) %>%
     addMetricRow(photo_stats) %>% 
-    addMetricRow(sound_stats)
+    addMetricRow(sound_stats) %>% 
+    mutate(across(everything(), ~ as.numeric(.)))
     
   colnames(india_metrics) <- c (month.abb[Months], "YoY%")
   

@@ -38,7 +38,8 @@ genDistrictMetrics <- function ()
                                   by = "COUNTY.CODE") %>%  
                       left_join ( district_user_stats %>% 
                                     filter ( YEAR == PrevYear, MONTH == CurMonth),
-                                  by = "COUNTY.CODE") 
+                                  by = "COUNTY.CODE") %>% 
+                      arrange(COUNTY.CODE)
 
 # Bad code. Move to just numbering of the columns  
   district_metrics <- district_metrics %>%
@@ -65,38 +66,31 @@ genDistrictMetrics <- function ()
                                   "Users_CurMCurY",
                                   "Users_PreMCurY",
                                   "Users_CurMPreY")
+  
+  district_metrics[is.na(district_metrics)] = 0
                                   
   district_metrics <- district_metrics %>% 
-                    mutate (
-                            Obsv_Trend   = round (100 * (Obsv_CurMCurY - Obsv_CurMPreY)/Obsv_CurMPreY,0) %>% accounting(),
-                            Lists_Trend  = round (100 * (Lists_CurMCurY - Lists_CurMPreY)/Lists_CurMPreY,0) %>% accounting(),
-                            Users_Trend  = round (100 * (Users_CurMCurY - Users_CurMPreY)/Users_CurMPreY,0) %>% accounting())
+    mutate(Obsv_Trend   = round (100 * (Obsv_CurMCurY - Obsv_CurMPreY)/Obsv_CurMPreY,0) %>% accounting(),
+           Lists_Trend  = round (100 * (Lists_CurMCurY - Lists_CurMPreY)/Lists_CurMPreY,0) %>% accounting(),
+           Users_Trend  = round (100 * (Users_CurMCurY - Users_CurMPreY)/Users_CurMPreY,0) %>% accounting())
   
-  district_metrics <- district_metrics %>% select (
-                          COUNTY.CODE,
-                          Obsv_PreMCurY,
-                          Obsv_CurMCurY,
-                          Obsv_Trend,
-                          Lists_PreMCurY,
-                          Lists_CurMCurY,
-                          Lists_Trend,
-                          Users_PreMCurY,
-                          Users_CurMCurY,
-                          Users_Trend
-  )
-  
-  colnames (district_metrics) <- c (
-                                 "",
-                                 month.abb[PrevMonth],
-                                 month.abb[CurMonth],
-                                 "YoY%",
-                                 month.abb[PrevMonth],
-                                 month.abb[CurMonth],
-                                 "YoY%",
-                                 month.abb[PrevMonth],
-                                 month.abb[CurMonth],
-                                 "YoY%")
-  district_metrics[is.na(district_metrics)] = 0
+  district_metrics <- district_metrics %>% 
+    select(COUNTY.CODE,
+           Obsv_PreMCurY,
+           Obsv_CurMCurY,
+           Obsv_Trend,
+           Lists_PreMCurY,
+           Lists_CurMCurY,
+           Lists_Trend,
+           Users_PreMCurY,
+           Users_CurMCurY,
+           Users_Trend) %>% 
+    mutate(across(c(everything(), -COUNTY.CODE), ~ as.numeric(.))) %>% 
+    magrittr::set_colnames(c("",
+                             month.abb[PrevMonth], month.abb[CurMonth], "YoY%",
+                             month.abb[PrevMonth], month.abb[CurMonth], "YoY%",
+                             month.abb[PrevMonth], month.abb[CurMonth], "YoY%"))
+
   return (district_metrics)
 }
 #####################################################################

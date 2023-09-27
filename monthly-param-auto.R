@@ -23,6 +23,19 @@ rel_date <- if (today() %>% day() < 16) {
     floor_date(unit = "month")
 }
 
+# for PJ's metrics
+prevrel_date <- if (today() %>% day() < 16) {
+  ((today() - months(1)) - months(2)) %>%
+    floor_date(unit = "month")
+} else {
+  (today() - months(2)) %>%
+    floor_date(unit = "month")
+}
+# 
+# cur_date <- "2023-08-01"
+# rel_date <- "2023-07-01"
+# prevrel_date <- "2023-06-01"
+
 cur_year <- cur_date %>% year()
 cur_month_num <- cur_date %>% month()
 cur_month_lab <- cur_date %>% month(label = T, abbr = T)
@@ -33,21 +46,14 @@ rel_month_lab <- rel_date %>% month(label = T, abbr = T)
 
 
 # for PJ's metrics
-
-prevrel_date <- if (today() %>% day() < 16) {
-  ((today() - months(1)) - months(2)) %>%
-    floor_date(unit = "month")
-} else {
-  (today() - months(2)) %>%
-    floor_date(unit = "month")
-}
 PrevMonthNum <- prevrel_date %>% month()
 PrevMonthLab <- prevrel_date %>% month(label = T, abbr = T) 
-PrevYear <- prevrel_date %>% year()
 CurMonthLab <- rel_month_lab
 CurMonth <- rel_month_num
 CurYear <- rel_year
-Months <- seq((today() - months(6)), (today() - months(1)), by = "month") %>% month()
+PrevYear <- rel_year - 1
+Months <- seq((as_date(cur_date) - months(6)), (as_date(cur_date) - months(1)), 
+              by = "month") %>% month()
 
 #
 

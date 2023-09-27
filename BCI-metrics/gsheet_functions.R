@@ -3,17 +3,18 @@
 
 # params ----------------------------------------------------------------------------
 
-our_gsheet <- "https://docs.google.com/spreadsheets/d/1-A8w6TXPJn4HDCozJHvENeww9Zx-vrFgba50Bjq-H5o/edit#gid=96990122"
+our_gsheet <- "https://docs.google.com/spreadsheets/d/1ptmuVvQ7krxm8TlQQ7iz5Cr-YdngAGb53eewvhCvLcI/edit#gid=641296182"
+# test "https://docs.google.com/spreadsheets/d/1-A8w6TXPJn4HDCozJHvENeww9Zx-vrFgba50Bjq-H5o/edit#gid=96990122"
 
-sheet_prefix_prev <- glue('{PrevMonthLab}-{str_trunc(PrevYear, width = 2, side = "left", ellipsis = "")}')
+sheet_prefix_prev <- glue('{PrevMonthLab}-{str_trunc(prevrel_date %>% year(), width = 2, side = "left", ellipsis = "")}')
 sheet_prefix_cur <- glue('{CurMonthLab}-{str_trunc(CurYear, width = 2, side = "left", ellipsis = "")}')
 
 # function -------------------------------------------------------------------------
 
 write_metrics_sheet <- function(metric_data, which_level) {
   
-  if (which_level %in% c("IN", "ST", "DT")) {
-    return('Please choose one of {"IN", "ST", "DT" for which_level.')
+  if (!which_level %in% c("IN", "ST", "DT")) {
+    return('Please choose one of {"IN", "ST", "DT"} for which_level.')
   }
 
   sheet_suffix <- which_level
@@ -42,4 +43,10 @@ write_metrics_sheet <- function(metric_data, which_level) {
               col_names = TRUE, # we need col names (months) to be updated
               reformat = FALSE) # we want to retain existing formatting (conditional colours for YoY%)
 
+  # on IN sheet, BCI website stats needs to be cleared cos PJ brings in separately
+  if (which_level == "IN") {
+    range_write(ss = our_gsheet, data = data.frame(matrix(NA, nrow = 3, ncol = 7)),
+                sheet = sheet_name_cur, range = "B11:H13", 
+                col_names = FALSE, reformat = FALSE) 
+  }
 }
