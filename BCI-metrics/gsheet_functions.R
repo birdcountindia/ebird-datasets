@@ -32,10 +32,19 @@ write_metrics_sheet <- function(metric_data, which_level) {
   }
   
   
-  # first, create a copy of appropriate old sheet
-  # refer https://googlesheets4.tidyverse.org/reference/sheet_copy.html
-  sheet_copy(from_ss = our_gsheet, .before = 1, # place as the first sheet
-             from_sheet = sheet_name_prev, to_sheet = sheet_name_cur)
+  if (!sheet_name_cur %in% (gs4_get(our_gsheet) %>% pluck(sheets, name))) {
+    
+    # first, create a copy of appropriate old sheet
+    # refer https://googlesheets4.tidyverse.org/reference/sheet_copy.html
+    
+    sheet_copy(from_ss = our_gsheet, .before = 1, # place as the first sheet
+               from_sheet = sheet_name_prev, to_sheet = sheet_name_cur)
+    
+  } else {
+    
+    print(glue("Sheet of interest ({sheet_name_cur}) already exists. Rewriting range."))
+    
+  }
 
   # then write our current/new data to specific range 
   range_write(ss = our_gsheet, data = metric_data,
