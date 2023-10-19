@@ -20,6 +20,18 @@ library(googlesheets4)
 # - five different R scripts in BCI-metrics/ folder
 ###   ###
 
+# function to get full path
+get_full_path <- function(file, dir = "EBD") {
+  
+  require(glue)
+
+  full_path <- if (dir == "EBD") {
+    glue("EBD/{file}")
+  }
+  
+  return(full_path)
+  
+}
 
 #### parameters ####
 
@@ -62,10 +74,10 @@ gs4_auth(email = "birdcountindia@ncf-india.org")
 
 #### unzipping EBD download (if not done already) ####
 
-if (!file.exists(rawpath) & file.exists(zippath)) {
-  unzip(zipfile = zippath, files = rawfile, exdir = "EBD") # don't add trailing slash in path
+if (!file.exists(path_ebd_main) & file.exists(path_zip)) {
+  unzip(zipfile = path_zip, files = file_ebd_main, exdir = "EBD") # don't add trailing slash in path
   print("Data download unzipped.")
-} else if (!file.exists(rawpath) & !file.exists(zippath)) {
+} else if (!file.exists(path_ebd_main) & !file.exists(path_zip)) {
   print("Latest data download does not exist!")
 } else {
   print("Data download already unzipped.")
@@ -76,15 +88,15 @@ if (!file.exists(rawpath) & file.exists(zippath)) {
 ### main EBD ###
 
 # this method using base R import takes only 373 sec with May 2022 release
-nms <- names(read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", 
+nms <- names(read.delim(path_ebd_main, nrows = 1, sep = "\t", header = T, quote = "", 
                         stringsAsFactors = F, na.strings = c(""," ", NA)))
 nms[!(nms %in% preimp)] <- "NULL"
 nms[nms %in% preimp] <- NA
-data <- read.delim(rawpath, colClasses = nms, sep = "\t", header = T, quote = "",
+data <- read.delim(path_ebd_main, colClasses = nms, sep = "\t", header = T, quote = "",
                    stringsAsFactors = F, na.strings = c(""," ",NA)) 
 
 # # tidy import takes way longer, a total of 877 sec, but could be useful for smaller data
-# data <- read_delim(rawpath, col_select = preimp,
+# data <- read_delim(path_ebd_main, col_select = preimp,
 #                    name_repair = make.names, # base R nomencl. with periods for spaces
 #                    quote = "", na = c(""," ", NA), show_col_types = F)
 
@@ -104,16 +116,6 @@ data <- bind_rows(data, senssp) %>%
 
 
 ### adding useful columns ###
-met_week <- function(dates) {
-  require(lubridate)
-  
-  normalyear <- c((0:363 %/% 7 + 1), 52)
-  leapyear   <- c(normalyear[1:59], 9, normalyear[60:365])
-  yearday    <- yday(dates)
-  
-  return(ifelse(leap_year(dates), leapyear[yearday], normalyear[yearday])) 
-}
-
 data <- data %>% 
   # trimming whitespace in breeding codes
   mutate(BREEDING.CODE = str_trim(BREEDING.CODE)) %>% 
@@ -183,7 +185,7 @@ if (cur_month_num == 1) {
 
 #### generating PJ's monthly metrics out of EBD ####
 
-print(glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
+print(glue("Generating metrics for {rel_month_lab} {rel_year} from {path_ebd_main}"))
 
 source("BCI-metrics/ebdMetrics.R")
 
