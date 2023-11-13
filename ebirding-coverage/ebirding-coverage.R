@@ -61,7 +61,7 @@ map_cov_text <- glue::glue("{label_comma()(data_cov$LOCATIONS)} locations
                       {label_comma()(data_cov$SPECIES)} species
                       {round(data_cov$OBSERVATIONS, 1)} million observations")
 
-map_cov_footer <- glue::glue("Data until {rel_month_lab} {rel_year}")
+map_cov_footer <- glue::glue("Data until {currel_month_lab} {currel_year}")
 
 
 data_loc <- data %>% distinct(LONGITUDE, LATITUDE)
@@ -209,7 +209,7 @@ for (i in unique(state_info$STATE)) {
                              {label_comma()(data_cov_state$SPECIES)} species
                              {label_comma()(data_cov_state$OBSERVATIONS)} observations")
   
-  map_cov_footer <- glue::glue("Data until {rel_month_lab} {rel_year}")
+  map_cov_footer <- glue::glue("Data until {currel_month_lab} {currel_year}")
   
   
   data_loc <- data %>% filter(STATE == cur_state) %>% distinct(LONGITUDE, LATITUDE)

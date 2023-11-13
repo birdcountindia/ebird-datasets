@@ -2,11 +2,11 @@
 ############# Script to create monthly metrics out of ebd########
 #################################################################
 
-nms2 <- names(read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", 
+nms2 <- names(read.delim(path_ebd_main, nrows = 1, sep = "\t", header = T, quote = "", 
                          stringsAsFactors = F, na.strings = c(""," ", NA)))
 nms2[!(nms2 %in% preimp_metrics)] <- "NULL"
 nms2[nms2 %in% preimp_metrics] <- NA
-ebd <- read.delim(rawpath, colClasses = nms2, sep = "\t", header = T, quote = "",
+ebd <- read.delim(path_ebd_main, colClasses = nms2, sep = "\t", header = T, quote = "",
                   # nrows = 100000, # For testing, this is useful
                   stringsAsFactors = F, na.strings = c(""," ",NA)) 
 
