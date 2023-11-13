@@ -16,16 +16,16 @@ preimp <- c("OBSERVER.ID")
 
 #### automated parameters ####
 
-cur_year <- today() %>% year()
-cur_month_num <- today() %>% month()
-cur_month_lab <- today() %>% month(label = T, abbr = T)
+real_year <- today() %>% year()
+real_month_num <- today() %>% month()
+real_month_lab <- today() %>% month(label = T, abbr = T)
 
-rel_year <- (today() - months(1)) %>% year()
-rel_month_num <- (today() - months(1)) %>% month()
-rel_month_lab <- (today() - months(1)) %>% month(label = T, abbr = T) 
+currel_year <- (today() - months(1)) %>% year()
+currel_month_num <- (today() - months(1)) %>% month()
+currel_month_lab <- (today() - months(1)) %>% month(label = T, abbr = T) 
 
-path_zip <- glue("EBD/{dataset_str}{rel_month_lab}-{rel_year}.zip")
-file_ebd_main <- glue("{dataset_str}{rel_month_lab}-{rel_year}.txt")
+path_zip <- glue("EBD/{dataset_str}{currel_month_lab}-{currel_year}.zip")
+file_ebd_main <- glue("{dataset_str}{currel_month_lab}-{currel_year}.txt")
 path_ebd_main <- glue("EBD/{file_ebd_main}")
 
 latestusersrel <- str_extract(userspath, "(?<=rel)[^.]*(?=.|$)")

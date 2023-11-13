@@ -1,6 +1,7 @@
 library(lubridate)
 library(tidyverse)
 library(glue)
+library(skimmr)
 
 library(magick)
 library(scales) # for comma format of numbers
@@ -41,8 +42,8 @@ get_full_path <- function(file, dir = "EBD") {
 # but will stay same for a number of months at a time
 
 # update when latest available
-senspath <- "EBD/ebd_sensitive_relFeb-2023_IN.txt" 
-groupaccspath <- "group-accounts/ebd_users_GA_relFeb-2023.csv"
+senspath <- "EBD/ebd_sensitive_relMay-2023_IN.txt" 
+groupaccspath <- "group-accounts/ebd_users_GA_relMay-2023.csv"
 
 dataset_str <- "ebd_IN_unv_smp_rel" # or "ebd_IN_rel" if no unvetted data
 
@@ -147,7 +148,7 @@ if (exists("data_slice_S")) {
 
 pmp_months <- seq(1, 12, by = 6) # Jan and Jul
 
-if (cur_month_num %in% pmp_months) {
+if (real_month_num %in% pmp_months) {
   
   data_pmp <- data %>% group_by(GROUP.ID) %>%
     filter(any(OBSERVER.ID == "obsr2607928")) %>% # PMP's eBird account ID
@@ -163,7 +164,7 @@ if (cur_month_num %in% pmp_months) {
 
 #### filtering for monthly challenge ####
 
-data_mc <- data %>% filter(YEAR == rel_year, MONTH == rel_month_num)
+data_mc <- data %>% filter(YEAR == currel_year, MONTH == currel_month_num)
 
 rm(.Random.seed)
 save(data_mc, file = mcdatapath)
@@ -172,9 +173,9 @@ save(data_mc, file = mcdatapath)
 
 #### filtering for yearly challenge (only for January) ####
 
-if (cur_month_num == 1) {
+if (real_month_num == 1) {
   
-  data_yc <- data %>% filter(YEAR == rel_year)
+  data_yc <- data %>% filter(YEAR == currel_year)
   
   save(data_yc, file = ycdatapath)
   
@@ -185,7 +186,7 @@ if (cur_month_num == 1) {
 
 #### generating PJ's monthly metrics out of EBD ####
 
-print(glue("Generating metrics for {rel_month_lab} {rel_year} from {path_ebd_main}"))
+print(glue("Generating metrics for {currel_month_lab} {currel_year} from {path_ebd_main}"))
 
 source("BCI-metrics/ebdMetrics.R")
 
