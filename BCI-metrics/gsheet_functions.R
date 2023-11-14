@@ -6,7 +6,7 @@
 our_gsheet <- "https://docs.google.com/spreadsheets/d/1ptmuVvQ7krxm8TlQQ7iz5Cr-YdngAGb53eewvhCvLcI/edit#gid=641296182"
 # test "https://docs.google.com/spreadsheets/d/1-A8w6TXPJn4HDCozJHvENeww9Zx-vrFgba50Bjq-H5o/edit#gid=96990122"
 
-sheet_prefix_prev <- glue('{PrevMonthLab}-{str_trunc(prevrel_date %>% year(), width = 2, side = "left", ellipsis = "")}')
+sheet_prefix_prev <- glue('{PrevMonthLab}-{str_trunc(date_prevrel %>% year(), width = 2, side = "left", ellipsis = "")}')
 sheet_prefix_cur <- glue('{CurMonthLab}-{str_trunc(CurYear, width = 2, side = "left", ellipsis = "")}')
 
 # function -------------------------------------------------------------------------
@@ -28,11 +28,11 @@ write_metrics_sheet <- function(metric_data, which_level) {
   } else if (which_level == "ST") {
     sheet_range <- "A2:J33"
   } else if (which_level == "DT") {
-    sheet_range <- "A2:J725"
+    sheet_range <- "A2:J726"
   }
   
   
-  if (!sheet_name_cur %in% (gs4_get(our_gsheet) %>% pluck(sheets, name))) {
+  if (!sheet_name_cur %in% (gs4_get(our_gsheet) %>% pluck("sheets", "name"))) {
     
     # first, create a copy of appropriate old sheet
     # refer https://googlesheets4.tidyverse.org/reference/sheet_copy.html
