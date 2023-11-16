@@ -16,17 +16,17 @@ preimp <- c("OBSERVER.ID")
 
 #### automated parameters ####
 
-cur_year <- today() %>% year()
-cur_month_num <- today() %>% month()
-cur_month_lab <- today() %>% month(label = T, abbr = T)
+real_year <- today() %>% year()
+real_month_num <- today() %>% month()
+real_month_lab <- today() %>% month(label = T, abbr = T)
 
-rel_year <- (today() - months(1)) %>% year()
-rel_month_num <- (today() - months(1)) %>% month()
-rel_month_lab <- (today() - months(1)) %>% month(label = T, abbr = T) 
+currel_year <- (today() - months(1)) %>% year()
+currel_month_num <- (today() - months(1)) %>% month()
+currel_month_lab <- (today() - months(1)) %>% month(label = T, abbr = T) 
 
-zippath <- glue("EBD/{dataset_str}{rel_month_lab}-{rel_year}.zip")
-rawfile <- glue("{dataset_str}{rel_month_lab}-{rel_year}.txt")
-rawpath <- glue("EBD/{rawfile}")
+path_zip <- glue("EBD/{dataset_str}{currel_month_lab}-{currel_year}.zip")
+file_ebd_main <- glue("{dataset_str}{currel_month_lab}-{currel_year}.txt")
+path_ebd_main <- glue("EBD/{file_ebd_main}")
 
 latestusersrel <- str_extract(userspath, "(?<=rel)[^.]*(?=.|$)")
 groupaccspath <- glue("group-accounts/ebd_users_GA_rel{latestusersrel}.csv")
@@ -41,18 +41,18 @@ groupaccspath <- glue("group-accounts/ebd_users_GA_rel{latestusersrel}.csv")
 
 if (file.exists(userspath) & !file.exists(groupaccspath)) {
   
-  if (!file.exists(rawpath) & file.exists(zippath)) {
-    unzip(zipfile = zippath, files = rawfile, exdir = "EBD")
-  } else if (!file.exists(rawpath) & !file.exists(zippath)) {
+  if (!file.exists(path_ebd_main) & file.exists(path_zip)) {
+    unzip(zipfile = path_zip, files = file_ebd_main, exdir = "EBD")
+  } else if (!file.exists(path_ebd_main) & !file.exists(path_zip)) {
     print("Latest data download does not exist!")
     }
 
   ### main EBD ###
-  nms <- names(read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", 
+  nms <- names(read.delim(path_ebd_main, nrows = 1, sep = "\t", header = T, quote = "", 
                           stringsAsFactors = F, na.strings = c(""," ", NA)))
   nms[!(nms %in% preimp)] <- "NULL"
   nms[nms %in% preimp] <- NA
-  data <- read.delim(rawpath, colClasses = nms, sep = "\t", header = T, quote = "",
+  data <- read.delim(path_ebd_main, colClasses = nms, sep = "\t", header = T, quote = "",
                      stringsAsFactors = F, na.strings = c(""," ",NA)) 
   
   data <- data %>% distinct(OBSERVER.ID)

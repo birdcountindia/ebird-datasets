@@ -9,13 +9,13 @@ preimp <- c("CATEGORY","COMMON.NAME","OBSERVATION.COUNT",
             "TRIP.COMMENTS")
 
 
-rawpath <- "ebd_IN_relAug-2021.txt"
-nms <- names(read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", stringsAsFactors = F,
+path_ebd_main <- "ebd_IN_relAug-2021.txt"
+nms <- names(read.delim(path_ebd_main, nrows = 1, sep = "\t", header = T, quote = "", stringsAsFactors = F,
                         na.strings = c(""," ", NA)))
 nms[!(nms %in% preimp)] <- "NULL"
 nms[nms %in% preimp] <- NA
 # 5 mins
-data <- read.delim(rawpath, colClasses = nms, sep = "\t", header = T, quote = "",
+data <- read.delim(path_ebd_main, colClasses = nms, sep = "\t", header = T, quote = "",
                       stringsAsFactors = F, na.strings = c(""," ",NA))
 
 
