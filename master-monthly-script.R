@@ -75,26 +75,67 @@ gs4_auth(email = "birdcountindia@ncf-india.org")
 
 #### unzipping EBD download (if not done already) ####
 
-if (!file.exists(path_ebd_main) & file.exists(path_zip)) {
-  unzip(zipfile = path_zip, files = file_ebd_main, exdir = "EBD") # don't add trailing slash in path
-  print("Data download unzipped.")
-} else if (!file.exists(path_ebd_main) & !file.exists(path_zip)) {
-  print("Latest data download does not exist!")
-} else {
+if (file.exists(path_ebd_main) & file.exists(path_sed)) {
+  
   print("Data download already unzipped.")
+  
+} else if (!file.exists(path_ebd_main) & !file.exists(path_sed)) {
+  
+  if (!file.exists(path_zip)) {
+    
+    print("Latest data download does not exist!")
+    
+  } else {
+    
+    unzip(zipfile = path_zip, exdir = "EBD", # don't add trailing slash in path
+          files = c(file_ebd_main, file_sed))
+    print("Data download unzipped.")
+    
+  }
+  
 }
 
 #### main data processing steps ####
 
+read.ebd <- function(ebd_path, cols_sel = "all", cols_print_only = FALSE) {
+  
+  cols_all <- names(read.delim(ebd_path, nrows = 1,
+                               sep = "\t", header = TRUE, quote = "",
+                               stringsAsFactors = FALSE, na.strings = c("", " ", NA)))
+  
+  if (cols_print_only == TRUE) {
+    
+    print(cols_all)
+    
+  } else {
+    
+    if (cols_sel == "all") {
+      
+      data <- read.delim(ebd_path,
+                         sep = "\t", header = TRUE, quote = "",
+                         stringsAsFactors = FALSE, na.strings = c("", " ", NA))
+      
+    } else {
+      
+      cols_all[!(cols_all %in% cols_sel)] <- "NULL"
+      cols_all[cols_all %in% cols_sel] <- NA
+      
+      data <- read.delim(ebd_path, colClasses = cols_all,
+                         sep = "\t", header = TRUE, quote = "",
+                         stringsAsFactors = FALSE, na.strings = c("", " ", NA))
+      
+    }
+    
+    return(data)
+    
+  }
+  
+}
+
 ### main EBD ###
 
 # this method using base R import takes only 373 sec with May 2022 release
-nms <- names(read.delim(path_ebd_main, nrows = 1, sep = "\t", header = T, quote = "", 
-                        stringsAsFactors = F, na.strings = c(""," ", NA)))
-nms[!(nms %in% preimp)] <- "NULL"
-nms[nms %in% preimp] <- NA
-data <- read.delim(path_ebd_main, colClasses = nms, sep = "\t", header = T, quote = "",
-                   stringsAsFactors = F, na.strings = c(""," ",NA)) 
+data <- read.ebd(path_ebd_main, preimp) 
 
 # # tidy import takes way longer, a total of 877 sec, but could be useful for smaller data
 # data <- read_delim(path_ebd_main, col_select = preimp,
@@ -103,12 +144,7 @@ data <- read.delim(path_ebd_main, colClasses = nms, sep = "\t", header = T, quot
 
 
 ### sensitive species ###
-nms1 <- names(read.delim(senspath, nrows = 1, sep = "\t", header = T, quote = "", 
-                         stringsAsFactors = F, na.strings = c(""," ", NA)))
-nms1[!(nms1 %in% preimp)] <- "NULL"
-nms1[nms1 %in% preimp] <- NA
-senssp <- read.delim(senspath, colClasses = nms1, sep = "\t", header = T, quote = "",
-                     stringsAsFactors = F, na.strings = c(""," ",NA))
+senssp <- read.ebd(senspath, preimp)
 
 ### combing the two ###
 data <- bind_rows(data, senssp) %>% 
@@ -130,8 +166,13 @@ data <- data %>%
   mutate(M.YEAR = if_else(MONTH > 5, YEAR, YEAR-1), # from June to May
          M.MONTH = if_else(MONTH > 5, MONTH-5, 12-(5-MONTH))) 
 
+
+### sed ###
+data_sed <- read.ebd(path_sed, preimp)
+
 rm(.Random.seed)
-save(data, file = maindatapath)
+save(data, data_sed, 
+     file = maindatapath)
 
 
 ### sliced data ###
