@@ -97,41 +97,6 @@ if (file.exists(path_ebd_main) & file.exists(path_sed)) {
 
 #### main data processing steps ####
 
-read.ebd <- function(ebd_path, cols_sel = "all", cols_print_only = FALSE) {
-  
-  cols_all <- names(read.delim(ebd_path, nrows = 1,
-                               sep = "\t", header = TRUE, quote = "",
-                               stringsAsFactors = FALSE, na.strings = c("", " ", NA)))
-  
-  if (cols_print_only == TRUE) {
-    
-    print(cols_all)
-    
-  } else {
-    
-    if (cols_sel == "all") {
-      
-      data <- read.delim(ebd_path,
-                         sep = "\t", header = TRUE, quote = "",
-                         stringsAsFactors = FALSE, na.strings = c("", " ", NA))
-      
-    } else {
-      
-      cols_all[!(cols_all %in% cols_sel)] <- "NULL"
-      cols_all[cols_all %in% cols_sel] <- NA
-      
-      data <- read.delim(ebd_path, colClasses = cols_all,
-                         sep = "\t", header = TRUE, quote = "",
-                         stringsAsFactors = FALSE, na.strings = c("", " ", NA))
-      
-    }
-    
-    return(data)
-    
-  }
-  
-}
-
 ### main EBD ###
 
 # this method using base R import takes only 373 sec with May 2022 release
