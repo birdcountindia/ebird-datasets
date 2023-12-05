@@ -28,7 +28,7 @@ write_metrics_sheet <- function(metric_data, which_level) {
   } else if (which_level == "ST") {
     sheet_range <- "A2:J33"
   } else if (which_level == "DT") {
-    sheet_range <- "A2:J728"
+    sheet_range <- "A2:K728"
   }
   
   

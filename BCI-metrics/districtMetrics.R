@@ -44,6 +44,7 @@ genDistrictMetrics <- function ()
 # Bad code. Move to just numbering of the columns  
   district_metrics <- district_metrics %>%
                       select ("COUNTY.CODE", 
+                              "COUNTY",
                               "count.x",
                               "count.y",
                               "count.x.x",
@@ -56,7 +57,8 @@ genDistrictMetrics <- function ()
                               "count.y.y.y.y",
                               "count"
                               )
-  colnames (district_metrics) <- c ( "COUNTY.CODE",
+  colnames(district_metrics) <- c("COUNTY.CODE",
+                                  "COUNTY",
                                   "Obsv_CurMCurY",
                                   "Obsv_PreMCurY",
                                   "Obsv_CurMPreY",
@@ -76,6 +78,7 @@ genDistrictMetrics <- function ()
   
   district_metrics <- district_metrics %>% 
     select(COUNTY.CODE,
+           COUNTY,
            Obsv_PreMCurY,
            Obsv_CurMCurY,
            Obsv_Trend,
@@ -85,7 +88,7 @@ genDistrictMetrics <- function ()
            Users_PreMCurY,
            Users_CurMCurY,
            Users_Trend) %>% 
-    mutate(across(c(everything(), -COUNTY.CODE), ~ as.numeric(.))) %>% 
+    mutate(across(c(everything(), -COUNTY, -COUNTY.CODE), ~ as.numeric(.))) %>% 
     magrittr::set_colnames(c("",
                              month.abb[PrevMonth], month.abb[CurMonth], "YoY%",
                              month.abb[PrevMonth], month.abb[CurMonth], "YoY%",
