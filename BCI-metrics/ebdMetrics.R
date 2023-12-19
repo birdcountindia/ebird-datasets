@@ -90,7 +90,7 @@ county_coverage_stats <- ebd %>%
   summarise(coverage = round(100 * sum(covered) / min(Districts), 0))
 
 
-districts <- ebd %>% distinct(COUNTY.CODE)
+districts <- ebd %>% distinct(COUNTY.CODE, COUNTY)
 
 district_obsv_stats <- ebd %>% 
   group_by(COUNTY.CODE, YEAR, MONTH) %>%
