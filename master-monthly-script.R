@@ -2,7 +2,6 @@ library(lubridate)
 library(tidyverse)
 library(glue)
 library(skimmr)
-
 library(magick)
 library(scales) # for comma format of numbers
 library(grid)
@@ -10,6 +9,10 @@ library(googledrive)
 library(googlesheets4)
 
 # library(data.table) # required, but later command explicitly calls for it
+
+
+source("functions.R")
+
 
 ### required files in directory: ###
 # - latest EBD release .zip/.txt file
@@ -21,18 +24,6 @@ library(googlesheets4)
 # - five different R scripts in BCI-metrics/ folder
 ###   ###
 
-# function to get full path
-get_full_path <- function(file, dir = "EBD") {
-  
-  require(glue)
-
-  full_path <- if (dir == "EBD") {
-    glue("EBD/{file}")
-  }
-  
-  return(full_path)
-  
-}
 
 #### parameters ####
 
@@ -42,10 +33,8 @@ get_full_path <- function(file, dir = "EBD") {
 # but will stay same for a number of months at a time
 
 # update when latest available
-senspath <- "EBD/ebd_sensitive_relMay-2023_IN.txt" 
-groupaccspath <- "group-accounts/ebd_users_GA_relMay-2023.csv"
-
-dataset_str <- "ebd_IN_unv_smp_rel" # or "ebd_IN_rel" if no unvetted data
+senspath <- "EBD/ebd_sensitive_relNov-2023_IN.txt" 
+groupaccspath <- "group-accounts/ebd_users_GA_relNov-2023.csv"
 
 preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
             "LOCALITY.ID","LOCALITY.TYPE","REVIEWED","APPROVED","LAST.EDITED.DATE",
@@ -75,25 +64,7 @@ gs4_auth(email = "birdcountindia@ncf-india.org")
 
 #### unzipping EBD download (if not done already) ####
 
-if (file.exists(path_ebd_main) & file.exists(path_sed)) {
-  
-  print("Data download already unzipped.")
-  
-} else if (!file.exists(path_ebd_main) & !file.exists(path_sed)) {
-  
-  if (!file.exists(path_zip)) {
-    
-    print("Latest data download does not exist!")
-    
-  } else {
-    
-    unzip(zipfile = path_zip, exdir = "EBD", # don't add trailing slash in path
-          files = c(file_ebd_main, file_sed))
-    print("Data download unzipped.")
-    
-  }
-  
-}
+unzip_ebd()
 
 #### main data processing steps ####
 

@@ -1,3 +1,6 @@
+
+dataset_str <- "ebd_IN_unv_smp_rel" # or "ebd_IN_rel" if no unvetted data
+
 ### automated parameters for master monthly script
 
 require(tidyverse)

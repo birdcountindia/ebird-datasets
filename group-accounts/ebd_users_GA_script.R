@@ -3,30 +3,20 @@
 library(lubridate)
 library(tidyverse)
 library(glue)
+library(skimmr)
+
+source("functions.R")
 
 #### variable parameters (update manually) ####
 
-userspath <- "EBD/ebd_users_relFeb-2023.txt"
-prev_gapath <- "group-accounts/ebd_users_GA_relMay-2022.csv"
-
-dataset_str <- "ebd_IN_prv_rel" # or "ebd_IN_rel" if no unvetted data
-
-preimp <- c("OBSERVER.ID")
+userspath <- "EBD/ebd_users_relNov-2023.txt"
+prev_gapath <- "group-accounts/ebd_users_GA_relMay-2023.csv"
 
 
 #### automated parameters ####
 
-real_year <- today() %>% year()
-real_month_num <- today() %>% month()
-real_month_lab <- today() %>% month(label = T, abbr = T)
-
-currel_year <- (today() - months(1)) %>% year()
-currel_month_num <- (today() - months(1)) %>% month()
-currel_month_lab <- (today() - months(1)) %>% month(label = T, abbr = T) 
-
-path_zip <- glue("EBD/{dataset_str}{currel_month_lab}-{currel_year}.zip")
-file_ebd_main <- glue("{dataset_str}{currel_month_lab}-{currel_year}.txt")
-path_ebd_main <- glue("EBD/{file_ebd_main}")
+source("monthly-param-auto.R") 
+# when this also functionised, can add extra = FALSE argument here too
 
 latestusersrel <- str_extract(userspath, "(?<=rel)[^.]*(?=.|$)")
 groupaccspath <- glue("group-accounts/ebd_users_GA_rel{latestusersrel}.csv")
@@ -39,14 +29,14 @@ groupaccspath <- glue("group-accounts/ebd_users_GA_rel{latestusersrel}.csv")
 # If "userspath" has not been updated to latest, the groupaccspath file exists, so
 # this won't run.
 
-if (file.exists(userspath) & !file.exists(groupaccspath)) {
+if (!file.exists(userspath) & !file.exists(groupaccspath)) {
+  print("Latest users data does not exist.")
+} else if (file.exists(userspath) & !file.exists(groupaccspath)) {
   
-  if (!file.exists(path_ebd_main) & file.exists(path_zip)) {
-    unzip(zipfile = path_zip, files = file_ebd_main, exdir = "EBD")
-  } else if (!file.exists(path_ebd_main) & !file.exists(path_zip)) {
-    print("Latest data download does not exist!")
-    }
-
+  unzip_ebd()
+  
+  preimp <- c("OBSERVER.ID")
+  
   ### main EBD ###
   nms <- names(read.delim(path_ebd_main, nrows = 1, sep = "\t", header = T, quote = "", 
                           stringsAsFactors = F, na.strings = c(""," ", NA)))
@@ -56,7 +46,7 @@ if (file.exists(userspath) & !file.exists(groupaccspath)) {
                      stringsAsFactors = F, na.strings = c(""," ",NA)) 
   
   data <- data %>% distinct(OBSERVER.ID)
-
+  
   eBird_users <- read.delim(userspath, sep = "\t", header = T, 
                             quote = "", stringsAsFactors = F, na.strings = c(""," ",NA))
   eBird_users <- eBird_users %>% 
@@ -74,10 +64,10 @@ if (file.exists(userspath) & !file.exists(groupaccspath)) {
                 "etwork","Team","team","estival","Fest","fest","esearch","ecord",
                 "roject","iodivers","ational","eserve","rotect","Lodge","lodge","esort",
                 "anctuary","ildlife","epartment","Dept","dept","onservation","Trust",
-                "trust","ollect","Monitor","monitor")
+                "trust","ollect","Monitor","monitor","mateur","aturalist")
   
   # other group accounts without keywords in name
-  accounts <- c("GBCN Goa", "Dolphin Bengaluru", "obsr1288653") # same Dolphin but ID 
+  accounts <- c("GBCN Goa")
   
   data1 <- data0 %>% 
     filter(str_detect(FULL.NAME, paste(keywords, collapse = "|")) |
@@ -98,8 +88,6 @@ if (file.exists(userspath) & !file.exists(groupaccspath)) {
   
   write_csv(data2, file = temppath, na = "")
   
-} else if (!file.exists(userspath) & !file.exists(groupaccspath)) {
-  print("Latest users data does not exist.")
 } else {
   print("Latest group accounts data already exists!")
 }
