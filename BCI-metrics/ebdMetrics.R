@@ -2,11 +2,11 @@
 ############# Script to create monthly metrics out of ebd########
 #################################################################
 
-nms2 <- names(read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", 
+nms2 <- names(read.delim(path_ebd_main, nrows = 1, sep = "\t", header = T, quote = "", 
                          stringsAsFactors = F, na.strings = c(""," ", NA)))
 nms2[!(nms2 %in% preimp_metrics)] <- "NULL"
 nms2[nms2 %in% preimp_metrics] <- NA
-ebd <- read.delim(rawpath, colClasses = nms2, sep = "\t", header = T, quote = "",
+ebd <- read.delim(path_ebd_main, colClasses = nms2, sep = "\t", header = T, quote = "",
                   # nrows = 100000, # For testing, this is useful
                   stringsAsFactors = F, na.strings = c(""," ",NA)) 
 
@@ -56,19 +56,7 @@ india_list_stats <- ebd %>%
   summarise(count = n_distinct(GROUP.ID)) %>%
   ungroup()
 
-india_media_list_stats <- ebd %>% 
-  filter(HAS.MEDIA == 1) %>%
-  group_by(YEAR, MONTH) %>%
-  summarise(count = n_distinct(GROUP.ID)) %>%
-  ungroup()
-
 india_user_stats <- ebd %>%
-  group_by(YEAR, MONTH) %>%
-  summarise(count = n_distinct(OBSERVER.ID)) %>%
-  ungroup()
-
-india_media_user_stats <- ebd %>%
-  filter(HAS.MEDIA == 1) %>%
   group_by(YEAR, MONTH) %>%
   summarise(count = n_distinct(OBSERVER.ID)) %>%
   ungroup()
@@ -102,7 +90,7 @@ county_coverage_stats <- ebd %>%
   summarise(coverage = round(100 * sum(covered) / min(Districts), 0))
 
 
-districts <- ebd %>% distinct(COUNTY.CODE)
+districts <- ebd %>% distinct(COUNTY.CODE, COUNTY)
 
 district_obsv_stats <- ebd %>% 
   group_by(COUNTY.CODE, YEAR, MONTH) %>%
@@ -134,7 +122,6 @@ accounting <- function (number)
 
 photo_stats <<- 0
 sound_stats <<- 0
-video_stats <<- 0
 source ("BCI-metrics/mediaMlMetrics.R")
 
 pullMediaStats()
@@ -142,7 +129,6 @@ pullMediaStats()
 # Move this to mediaMLMetrics later
 colnames(photo_stats) <- c("YEAR", "MONTH", "count")
 colnames(sound_stats) <- c("YEAR", "MONTH", "count")
-colnames(video_stats) <- c("YEAR", "MONTH", "count")
 
 source("BCI-metrics/indiaMetrics.R")
 source("BCI-metrics/stateMetrics.R")
@@ -155,3 +141,11 @@ district_metrics <- genDistrictMetrics()
 write_csv(india_metrics, "BCI-metrics/india_metrics.csv")
 write_csv(state_metrics, "BCI-metrics/state_metrics.csv")
 write_csv(district_metrics, "BCI-metrics/district_metrics.csv")
+
+
+# uploading to GSheet
+source("BCI-metrics/gsheet_functions.R")
+
+write_metrics_sheet(district_metrics, "DT")
+write_metrics_sheet(state_metrics, "ST")
+write_metrics_sheet(india_metrics, "IN")

@@ -1,12 +1,15 @@
 require(tidyverse)
 
 # Required for maps:
+
 load("../india-maps/outputs/maps_sf.RData")
+
 require(magick)
 require(scales) # for comma format of numbers
 require(grid)
 require(glue)
 require(sf)
+
 
 source("ebirding-coverage/ebirding-coverage-functions.R")
 
@@ -44,7 +47,7 @@ map_cov_text <- glue::glue("{label_comma()(data_cov$LOCATIONS)} locations
                       {label_comma()(data_cov$SPECIES)} species
                       {round(data_cov$OBSERVATIONS, 1)} million observations")
 
-map_cov_footer <- glue::glue("Data until {rel_month_lab} {rel_year}")
+map_cov_footer <- glue::glue("Data until {currel_month_lab} {currel_year}")
 
 
 data_loc <- data %>% distinct(LONGITUDE, LATITUDE)
@@ -134,8 +137,13 @@ drive_put(coveragemappath1,
 cov_stats(data, scale = "state")
 
 ### coverage data csv ###
-data_cov <- data1 %>% left_join(data2) %>% left_join(data3) %>% left_join(data4) %>% 
-  left_join(data5) %>% left_join(data6) %>% left_join(data7)
+data_cov <- data1 %>% 
+  left_join(data2) %>% 
+  left_join(data3) %>% 
+  left_join(data4) %>% 
+  left_join(data5) %>% 
+  left_join(data6) %>% 
+  left_join(data7)
 
 
 ### looping across states ###
@@ -192,7 +200,7 @@ for (i in unique(state_info$STATE)) {
                              {label_comma()(data_cov_state$SPECIES)} species
                              {label_comma()(data_cov_state$OBSERVATIONS)} observations")
   
-  map_cov_footer <- glue::glue("Data until {rel_month_lab} {rel_year}")
+  map_cov_footer <- glue::glue("Data until {currel_month_lab} {currel_year}")
   
   
   data_loc <- data %>% filter(STATE == cur_state) %>% distinct(LONGITUDE, LATITUDE)
