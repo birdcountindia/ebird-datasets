@@ -1,29 +1,15 @@
 require(tidyverse)
 
 # Required for maps:
-load("maps_sf.RData")
+
+load("../india-maps/outputs/maps_sf.RData")
+
 require(magick)
 require(scales) # for comma format of numbers
 require(grid)
 require(glue)
 require(sf)
 
-# # converting spdf to sf
-# indiamap_sf <- indiamap %>% 
-#   st_as_sf() %>% 
-#   dplyr::select(-DISTRICT) 
-# 
-# statemap_sf <- statemap %>% 
-#   st_as_sf() %>% 
-#   dplyr::select(ST_NM, geometry) %>% 
-#   magrittr::set_colnames(c("STATE", "geometry")) %>% 
-#   mutate(STATE = str_to_title(STATE)) %>% 
-#   # replacing ampersand with "and"
-#   mutate(STATE = str_replace(STATE, "&", "and")) %>% 
-#   # corrections for Madhu's SPDF values
-#   mutate(STATE = case_when(STATE == "Dadra and Nagar Have" ~ "Dadra and Nagar Haveli",
-#                            STATE == "Andaman and Nicobar" ~ "Andaman and Nicobar Islands",
-#                            TRUE ~ STATE))
 
 source("ebirding-coverage/ebirding-coverage-functions.R")
 

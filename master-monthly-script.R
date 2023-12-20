@@ -25,16 +25,17 @@ source("functions.R")
 ###   ###
 
 
+#### updating latest users, groupaccs, senssp data ####
+
+source("EBD/latest_non-EBD_paths.R")
+
+
 #### parameters ####
-
-### variable parameters ###
-
-# parameters of interest that might change over time depending on requirements
-# but will stay same for a number of months at a time
 
 # update when latest available
 senspath <- "EBD/ebd_sensitive_relNov-2023_IN.txt" 
 groupaccspath <- "group-accounts/ebd_users_GA_relNov-2023.csv"
+
 
 preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
             "LOCALITY.ID","LOCALITY.TYPE","REVIEWED","APPROVED","LAST.EDITED.DATE",
@@ -52,6 +53,9 @@ preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DAT
 
 
 ### automation parameters ###
+
+# paths to latest versions of user & GA info, and sensitive species data
+load("EBD/latest_non-EBD_paths.RData")
 
 # (only works when using new rel. data in the month it comes out, e.g., working with relJun in July)
 source("monthly-param-auto.R")
