@@ -1,7 +1,7 @@
 library(lubridate)
 library(tidyverse)
 library(glue)
-
+library(skimmr)
 library(magick)
 library(scales) # for comma format of numbers
 library(grid)
@@ -9,6 +9,10 @@ library(googledrive)
 library(googlesheets4)
 
 # library(data.table) # required, but later command explicitly calls for it
+
+
+source("functions.R")
+
 
 ### required files in directory: ###
 # - latest EBD release .zip/.txt file
@@ -28,9 +32,10 @@ source("EBD/latest_non-EBD_paths.R")
 
 #### parameters ####
 
-### variable parameters ###
+# update when latest available
+senspath <- "EBD/ebd_sensitive_relNov-2023_IN.txt" 
+groupaccspath <- "group-accounts/ebd_users_GA_relNov-2023.csv"
 
-dataset_str <- "ebd_IN_unv_smp_rel" # or "ebd_IN_rel" if no unvetted data
 
 preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
             "LOCALITY.ID","LOCALITY.TYPE","REVIEWED","APPROVED","LAST.EDITED.DATE",
@@ -44,7 +49,7 @@ preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
 preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DATE",
                     # "OBSERVATION.COUNT",
                     "OBSERVER.ID", "SAMPLING.EVENT.IDENTIFIER", "ALL.SPECIES.REPORTED",
-                    "GROUP.IDENTIFIER", "HAS.MEDIA", "APPROVED")
+                    "GROUP.IDENTIFIER", "HAS.MEDIA", "APPROVED", "COUNTY")
 
 
 ### automation parameters ###
@@ -55,7 +60,7 @@ load("EBD/latest_non-EBD_paths.RData")
 # (only works when using new rel. data in the month it comes out, e.g., working with relJun in July)
 source("monthly-param-auto.R")
 
-#### authenticating GDrive for upload of coverage ####
+#### authenticating GDrive/GSheets for upload of coverage, metrics ####
 
 drive_auth(email = "birdcountindia@ncf-india.org")
 gs4_auth(email = "birdcountindia@ncf-india.org")
@@ -63,14 +68,7 @@ gs4_auth(email = "birdcountindia@ncf-india.org")
 
 #### unzipping EBD download (if not done already) ####
 
-if (!file.exists(rawpath) & file.exists(zippath)) {
-  unzip(zipfile = zippath, files = rawfile, exdir = "EBD") # don't add trailing slash in path
-  print("Data download unzipped.")
-} else if (!file.exists(rawpath) & !file.exists(zippath)) {
-  print("Latest data download does not exist!")
-} else {
-  print("Data download already unzipped.")
-}
+unzip_ebd()
 
 # SED
 if (dataset_str == "ebd_IN_unv_smp_rel") {
@@ -89,26 +87,16 @@ if (dataset_str == "ebd_IN_unv_smp_rel") {
 ### main EBD ###
 
 # this method using base R import takes only 373 sec with May 2022 release
-nms <- names(read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", 
-                        stringsAsFactors = F, na.strings = c(""," ", NA)))
-nms[!(nms %in% preimp)] <- "NULL"
-nms[nms %in% preimp] <- NA
-data <- read.delim(rawpath, colClasses = nms, sep = "\t", header = T, quote = "",
-                   stringsAsFactors = F, na.strings = c(""," ",NA)) 
+data <- read.ebd(path_ebd_main, preimp) 
 
 # # tidy import takes way longer, a total of 877 sec, but could be useful for smaller data
-# data <- read_delim(rawpath, col_select = preimp,
+# data <- read_delim(path_ebd_main, col_select = preimp,
 #                    name_repair = make.names, # base R nomencl. with periods for spaces
 #                    quote = "", na = c(""," ", NA), show_col_types = F)
 
 
 ### sensitive species ###
-nms1 <- names(read.delim(senspath, nrows = 1, sep = "\t", header = T, quote = "", 
-                         stringsAsFactors = F, na.strings = c(""," ", NA)))
-nms1[!(nms1 %in% preimp)] <- "NULL"
-nms1[nms1 %in% preimp] <- NA
-senssp <- read.delim(senspath, colClasses = nms1, sep = "\t", header = T, quote = "",
-                     stringsAsFactors = F, na.strings = c(""," ",NA))
+senssp <- read.ebd(senspath, preimp)
 
 ### combing the two ###
 data <- bind_rows(data, senssp) %>% 
@@ -117,16 +105,6 @@ data <- bind_rows(data, senssp) %>%
 
 
 ### adding useful columns ###
-met_week <- function(dates) {
-  require(lubridate)
-  
-  normalyear <- c((0:363 %/% 7 + 1), 52)
-  leapyear   <- c(normalyear[1:59], 9, normalyear[60:365])
-  yearday    <- yday(dates)
-  
-  return(ifelse(leap_year(dates), leapyear[yearday], normalyear[yearday])) 
-}
-
 data <- data %>% 
   # trimming whitespace in breeding codes
   mutate(BREEDING.CODE = str_trim(BREEDING.CODE)) %>% 
@@ -140,8 +118,13 @@ data <- data %>%
   mutate(M.YEAR = if_else(MONTH > 5, YEAR, YEAR-1), # from June to May
          M.MONTH = if_else(MONTH > 5, MONTH-5, 12-(5-MONTH))) 
 
+
+### sed ###
+data_sed <- read.ebd(path_sed, preimp)
+
 rm(.Random.seed)
-save(data, file = maindatapath)
+save(data, data_sed, 
+     file = maindatapath)
 
 
 ### sliced data ###
@@ -158,7 +141,7 @@ if (exists("data_slice_S")) {
 
 pmp_months <- seq(1, 12, by = 6) # Jan and Jul
 
-if (cur_month_num %in% pmp_months) {
+if (real_month_num %in% pmp_months) {
   
   data_pmp <- data %>% group_by(GROUP.ID) %>%
     filter(any(OBSERVER.ID == "obsr2607928")) %>% # PMP's eBird account ID
@@ -174,7 +157,7 @@ if (cur_month_num %in% pmp_months) {
 
 #### filtering for monthly challenge ####
 
-data_mc <- data %>% filter(YEAR == rel_year, MONTH == rel_month_num)
+data_mc <- data %>% filter(YEAR == currel_year, MONTH == currel_month_num)
 
 rm(.Random.seed)
 save(data_mc, file = mcdatapath)
@@ -183,9 +166,9 @@ save(data_mc, file = mcdatapath)
 
 #### filtering for yearly challenge (only for January) ####
 
-if (cur_month_num == 1) {
+if (real_month_num == 1) {
   
-  data_yc <- data %>% filter(YEAR == rel_year)
+  data_yc <- data %>% filter(YEAR == currel_year)
   
   save(data_yc, file = ycdatapath)
   
@@ -196,7 +179,7 @@ if (cur_month_num == 1) {
 
 #### generating PJ's monthly metrics out of EBD ####
 
-print(glue::glue("Generating metrics for {rel_month_lab} {rel_year} from {rawpath}"))
+print(glue("Generating metrics for {currel_month_lab} {currel_year} from {path_ebd_main}"))
 
 source("BCI-metrics/ebdMetrics.R")
 

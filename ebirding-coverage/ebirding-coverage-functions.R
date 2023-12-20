@@ -26,7 +26,7 @@ cov_stats <- function(data, scale, state_info)
     temp3 <- data0 %>% 
       group_by(GROUP.ID) %>% 
       filter(any(HAS.MEDIA == 1)) %>% 
-      ungroup()  %>%
+      ungroup() %>%
       summarise(M.LISTS = n_distinct(GROUP.ID))
     
     data2 <- cbind(temp1, temp2, temp3)
@@ -50,7 +50,10 @@ cov_stats <- function(data, scale, state_info)
     
     ### states/UTs & districts ###
     data5 <- data0 %>% 
-      summarise(STATES = n_distinct(STATE), DISTRICTS = n_distinct(COUNTY))
+      filter(!is.na(STATE.CODE), 
+             !is.na(COUNTY.CODE)) %>% 
+      summarise(STATES = n_distinct(STATE.CODE), 
+                DISTRICTS = n_distinct(COUNTY.CODE))
     
     
     ### species ###
@@ -62,7 +65,8 @@ cov_stats <- function(data, scale, state_info)
       summarise(SPECIES = n_distinct(COMMON.NAME))
     
     ### observations ###
-    data7 <- data %>% summarise(OBSERVATIONS = round(n()/1000000, 2)) # in millions
+    data7 <- data %>% 
+      summarise(OBSERVATIONS = round(n()/1000000, 2)) # in millions
     
   } else if (scale == "state") {
     
@@ -112,7 +116,10 @@ cov_stats <- function(data, scale, state_info)
     
     ### states/UTs & districts ###
     data5 <- data0 %>% 
-      summarise(STATES = n_distinct(STATE), DISTRICTS = n_distinct(COUNTY))
+      filter(!is.na(STATE.CODE), 
+             !is.na(COUNTY.CODE)) %>% 
+      summarise(STATES = n_distinct(STATE.CODE), 
+                DISTRICTS = n_distinct(COUNTY.CODE))
     
     
     ### species ###
