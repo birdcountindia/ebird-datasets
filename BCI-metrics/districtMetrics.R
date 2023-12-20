@@ -89,7 +89,7 @@ genDistrictMetrics <- function ()
            Users_CurMCurY,
            Users_Trend) %>% 
     mutate(across(c(everything(), -COUNTY, -COUNTY.CODE), ~ as.numeric(.))) %>% 
-    magrittr::set_colnames(c("",
+    magrittr::set_colnames(c("", "",
                              month.abb[PrevMonth], month.abb[CurMonth], "YoY%",
                              month.abb[PrevMonth], month.abb[CurMonth], "YoY%",
                              month.abb[PrevMonth], month.abb[CurMonth], "YoY%"))

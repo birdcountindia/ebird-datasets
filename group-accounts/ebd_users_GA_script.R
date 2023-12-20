@@ -64,7 +64,7 @@ if (!file.exists(userspath) & !file.exists(groupaccspath)) {
                 "etwork","Team","team","estival","Fest","fest","esearch","ecord",
                 "roject","iodivers","ational","eserve","rotect","Lodge","lodge","esort",
                 "anctuary","ildlife","epartment","Dept","dept","onservation","Trust",
-                "trust","ollect","Monitor","monitor","mateur","aturalist")
+                "trust","ollect","Monitor","monitor","mateur","aturalists")
   
   # other group accounts without keywords in name
   accounts <- c("GBCN Goa")

@@ -48,7 +48,7 @@ preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
 preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DATE",
                     # "OBSERVATION.COUNT",
                     "OBSERVER.ID", "SAMPLING.EVENT.IDENTIFIER", "ALL.SPECIES.REPORTED",
-                    "GROUP.IDENTIFIER", "HAS.MEDIA", "APPROVED")
+                    "GROUP.IDENTIFIER", "HAS.MEDIA", "APPROVED", "COUNTY")
 
 
 ### automation parameters ###
