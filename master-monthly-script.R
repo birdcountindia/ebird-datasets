@@ -72,10 +72,10 @@ unzip_ebd()
 
 # SED
 if (dataset_str == "ebd_IN_unv_smp_rel") {
-  if (!file.exists(rawpath_sed) & file.exists(zippath)) {
-    unzip(zipfile = zippath, files = rawfile_sed, exdir = "EBD") # don't add trailing slash in path
+  if (!file.exists(path_sed) & file.exists(path_zip)) {
+    unzip(zipfile = path_zip, files = file_sed, exdir = "EBD") # don't add trailing slash in path
     print("Data download unzipped.")
-  } else if (!file.exists(rawpath_sed) & !file.exists(zippath)) {
+  } else if (!file.exists(path_sed) & !file.exists(path_zip)) {
     print("Latest data download does not exist!")
   } else {
     print("Data download already unzipped.")
