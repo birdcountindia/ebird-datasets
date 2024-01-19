@@ -129,7 +129,9 @@ data_sed <- read.ebd(path_sed, preimp) %>%
          DAY.M = day(OBSERVATION.DATE)) %>% 
   # migratory year and month information
   mutate(M.YEAR = if_else(MONTH > 5, YEAR, YEAR-1), # from June to May
-         M.MONTH = if_else(MONTH > 5, MONTH-5, 12-(5-MONTH))) 
+         M.MONTH = if_else(MONTH > 5, MONTH-5, 12-(5-MONTH))) %>% 
+  # OBSERVER.ID is in different format; change to main EBD format
+  mutate(OBSERVER.ID = str_replace(OBSERVER.ID, "obs", "obsr"))
 
 
 rm(.Random.seed)
