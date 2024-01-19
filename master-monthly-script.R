@@ -120,7 +120,17 @@ data <- data %>%
 
 
 ### sed ###
-data_sed <- read.ebd(path_sed, preimp)
+data_sed <- read.ebd(path_sed, preimp) %>% 
+  # group ID and dates
+  mutate(GROUP.ID = ifelse(is.na(GROUP.IDENTIFIER), SAMPLING.EVENT.IDENTIFIER, GROUP.IDENTIFIER), 
+         OBSERVATION.DATE = as.Date(OBSERVATION.DATE), 
+         YEAR = year(OBSERVATION.DATE), 
+         MONTH = month(OBSERVATION.DATE),
+         DAY.M = day(OBSERVATION.DATE)) %>% 
+  # migratory year and month information
+  mutate(M.YEAR = if_else(MONTH > 5, YEAR, YEAR-1), # from June to May
+         M.MONTH = if_else(MONTH > 5, MONTH-5, 12-(5-MONTH))) 
+
 
 rm(.Random.seed)
 save(data, data_sed, 
@@ -137,9 +147,16 @@ if (exists("data_slice_S")) {
   save(data_slice_G, file = slicedatapath)
 }
 
-#### filtering for PMP (only for alternate months) ####
 
-pmp_months <- seq(1, 12, by = 6) # Jan and Jul
+### data including SED ###
+data_ebdsed <- data %>% 
+  bind_rows(data_sed %>% 
+              filter(!SAMPLING.EVENT.IDENTIFIER %in% data$SAMPLING.EVENT.IDENTIFIER))
+
+
+#### filtering for PMP (only for Jan and Jul) ####
+
+pmp_months <- seq(1, 12, by = 6)
 
 if (real_month_num %in% pmp_months) {
   
@@ -157,9 +174,8 @@ if (real_month_num %in% pmp_months) {
 
 #### filtering for monthly challenge ####
 
-data_mc <- data %>% filter(YEAR == currel_year, MONTH == currel_month_num)
+data_mc <- data_ebdsed %>% filter(YEAR == currel_year, MONTH == currel_month_num)
 
-rm(.Random.seed)
 save(data_mc, file = mcdatapath)
 
 
@@ -168,7 +184,7 @@ save(data_mc, file = mcdatapath)
 
 if (real_month_num == 1) {
   
-  data_yc <- data %>% filter(YEAR == currel_year)
+  data_yc <- data_ebdsed %>% filter(YEAR == currel_year)
   
   save(data_yc, file = ycdatapath)
   
