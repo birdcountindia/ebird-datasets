@@ -25,6 +25,7 @@ write_metrics_sheet <- function(metric_data, which_level) {
   # range of cells in GSheet to write to, based on which metric
   if (which_level == "IN") {
     sheet_range <- "B1:H7"
+    website_range <- "B12:H14"
   } else if (which_level == "ST") {
     sheet_range <- "A2:J33"
   } else if (which_level == "DT") {
@@ -55,7 +56,7 @@ write_metrics_sheet <- function(metric_data, which_level) {
   # on IN sheet, BCI website stats needs to be cleared cos PJ brings in separately
   if (which_level == "IN") {
     range_write(ss = our_gsheet, data = data.frame(matrix(NA, nrow = 3, ncol = 7)),
-                sheet = sheet_name_cur, range = "B11:H13", 
+                sheet = sheet_name_cur, range = website_range, 
                 col_names = FALSE, reformat = FALSE) 
   }
 }
