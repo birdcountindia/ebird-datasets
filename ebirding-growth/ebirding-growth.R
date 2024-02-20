@@ -34,18 +34,18 @@ x_breaks <- 2000:(currel_year - 1)
 dataprog_lists <- ggplot(data_growth, aes(x = YEAR, y = TOT.LISTS)) +
   geom_point(size = 3, colour = "#fcfa53") +
   geom_line(linewidth = 1, colour = "#fcfa53") +
-  geom_hline(yintercept = y_t1, linetype = "dotted", colour = "#CCCCCC80") +
+  geom_vline(xintercept = 2014, linetype = "dotted", colour = "#CCCCCC80") +
   geom_text(aes(x = 2014, y = y_t1, 
                 label = glue("{round(y_t1/1000, 1)} K")),
-            size = 3, colour = "#CCCCCC", nudge_y = -15000) +
+            size = 3, colour = "#CCCCCC", nudge_x = 0.7) +
   scale_x_continuous(breaks = x_breaks,
                      # interested in after eBird established in India
                      limits = c(min(x_breaks), max(x_breaks))) +
   scale_y_continuous(breaks = y_breaks,
                      labels = y_breaks_lab) +
   coord_cartesian(clip = "off") +
-  labs(x = "Year", y = "Number of lists (in thousands)",
-       title = glue("Growth of eBird in {cur_unit}"),
+  labs(x = "Year", y = "Number of complete lists per year",
+       title = glue("eBirding in {cur_unit} over time"),
        subtitle = glue("Data until {currel_month_lab} {currel_year}")) +
   theme_void() +
   theme(axis.text.x = element_text(colour = "#CCCCCC", size = 8),
