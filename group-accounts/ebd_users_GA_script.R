@@ -10,8 +10,8 @@ source("functions.R")
 
 #### variable parameters (update manually) ####
 
-userspath <- "EBD/ebd_users_relNov-2023.txt"
-prev_gapath <- "group-accounts/ebd_users_GA_relMay-2023.csv"
+userspath <- "EBD/ebd_users_relFeb-2024.txt"
+prev_gapath <- "group-accounts/ebd_users_GA_relNov-2023.csv"
 
 
 #### automated parameters ####
