@@ -181,6 +181,33 @@ for (i in unique(state_info$STATE)) {
   coveragemappath1 <- filter(coveragepaths_st, STATE == cur_state)$MAP1
   coveragemappath2 <- filter(coveragepaths_st, STATE == cur_state)$MAP2
   
+  # structuring all states into GBBC regions (different directories in the drive)
+  gdrive_paths <- state_info %>% 
+    distinct(STATE, STATE.CODE) %>% 
+    mutate(PATH = case_when(
+      # islands
+      STATE.CODE %in% c("LD", "AN") ~ "1LEDzwLenDEnloYAz6byPMv3CpZ6p9GWq",
+      # himalaya
+      STATE.CODE %in% c("LA", "UL", "JK", "HP") ~ "1CB-eiWiPAPswn046-qHVvoXk-JVH2fj5",
+      # central
+      STATE.CODE %in% c("OR", "MH", "MP", "JH", "CT") ~ "13IAnURDQ27PN8hYGsp1oW45a6jX_0Kn4",
+      # east
+      STATE.CODE %in% c("WB", "TR", "SK", "ML",
+                        "NL", "MZ", "MN", "AS", "AR") ~ "1YBet1B385TYsLUNW0g5mnuFvlRgKw_nu",
+      # west
+      STATE.CODE %in% c("RJ", "GJ", "DD", "DN") ~ "1I0yrsckX5E7qG9KjQQDLS6GQ091CTC0s",
+      # north
+      STATE.CODE %in% c("UP", "PB", "HR", "DL",
+                        "CH", "BI") ~ "1b4wrce8oTYtH4r14oUDp3LCE_bl-qxu9",
+      #south
+      STATE.CODE %in% c("GA", "TS", "TN", "PY",
+                        "KL", "KA", "AP") ~ "1Trb-wv0D9ljP9BuymFHSwpUZ6hf_gfX7"
+    ))
+  
+  cur_gdrive_path <- gdrive_paths %>% 
+    filter(STATE == cur_state) %>% 
+    pull(PATH)
+  
   data_cov_state <- filter(data_cov, STATE == cur_state)
   
   plural_districts <- ifelse(data_cov_state$DISTRICTS == 1, "district", "districts")
@@ -282,11 +309,12 @@ for (i in unique(state_info$STATE)) {
   
   print(glue("Monthly coverage maps for {cur_state} ({count}/37) created."))
   
+  
   #### uploading to GDrive ###
 
   # "put" overwrites/updates existing file whereas "upload" creates new files each time
   drive_put(coveragemappath1, 
-            path = as_id("16qhxEVi7POAHaeQs_z4u6-C9IoHdrd8T"),
+            path = as_id(cur_gdrive_path),
             name = glue("{str_pad(count, width=2, pad='0')} {cur_state}.png"))
   
   print(glue("Monthly coverage maps for {cur_state} ({count}/37) uploaded to GDrive."))
