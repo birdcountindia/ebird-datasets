@@ -65,10 +65,11 @@ if (!file.exists(userspath) & !file.exists(groupaccspath)) {
                 "etwork","Team","team","estival","Fest","fest","esearch","ecord",
                 "roject","iodivers","ational","eserve","rotect","Lodge","lodge","esort",
                 "anctuary","ildlife","epartment","Dept","dept","onservation","Trust",
-                "trust","ollect","Monitor","monitor","mateur","aturalists")
+                "trust","ollect","Monitor","monitor","mateur","aturalists","FES ","Fes ","fes ")
   
   # other group accounts without keywords in name
-  accounts <- c("GBCN Goa")
+  accounts <- c("GBCN Goa","Kali Tiger Reserve Uttara Kannada","EIACP WII",
+                "ENVIS WII")
   
   data1 <- data0 %>% 
     filter(str_detect(FULL.NAME, paste(keywords, collapse = "|")) |
