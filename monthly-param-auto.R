@@ -9,7 +9,7 @@ require(glue)
 
 
 get_param(extra = TRUE)
-# get_param(date_currel = "2023-09-01", extra = TRUE)
+# get_param(date_currel = "2024-06-01", extra = TRUE)
 
 
 #
