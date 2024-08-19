@@ -28,5 +28,5 @@ BCI-metrics/token.R
 
 ebirding-coverage/*.csv
 ebirding-coverage/maps/
-
+ebirding-growth/*/*.png
 
