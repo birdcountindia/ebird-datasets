@@ -40,12 +40,12 @@ data_growth <- growth_stats(data, "state")
 write_csv(data_growth, file = path_csv)
 
 
-walk(unique(state_info$STATE.CODE), ~ {
+iwalk(unique(state_info$STATE.CODE), ~ {
   
   cur_state_info <- state_info %>% filter(STATE.CODE == .x)  
   cur_state <- cur_state_info$STATE
   cur_data <- data_growth %>% filter(STATE == cur_state)  
-  cur_gdrive_path <- gdrive_paths() %>% filter(STATE == cur_state) %>% pull(PATH)
+  cur_gdrive_path <- gdrive_paths(state_info) %>% filter(STATE == cur_state) %>% pull(PATH)
   
 
   path_png <- glue("{path_growth}growth_rel{currel_month_lab}-{currel_year}_{.x}.png")
@@ -63,7 +63,7 @@ walk(unique(state_info$STATE.CODE), ~ {
   # "put" overwrites/updates existing file whereas "upload" creates new files each time
   drive_put(path_png, 
             path = as_id(cur_gdrive_path),
-            name = glue("{str_pad(count, width=2, pad='0')} {cur_state}.png"))
+            name = glue("{str_pad(.y, width=2, pad='0')} {cur_state}.png"))
 
 })
 

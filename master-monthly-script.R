@@ -202,4 +202,4 @@ source("ebirding-coverage/ebirding-coverage.R")
 
 # generating monthly growth graphs --------------------------------
 
-source("ebirding-coverage/ebirding-growth.R")
+source("ebirding-growth/ebirding-growth.R")
