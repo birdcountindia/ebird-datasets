@@ -1,72 +1,71 @@
 require(tidyverse)
 require(glue)
+require(magick)
 
-cur_unit <- "India"
-
-
-# summarising number of lists per year
-data_growth <- data %>% 
-  # complete lists
-  filter(ALL.SPECIES.REPORTED == 1) %>% 
-  # if state, filter for state
-  group_by(YEAR) %>% 
-  reframe(TOT.LISTS = n_distinct(SAMPLING.EVENT.IDENTIFIER))
-
-write_csv(data_growth,
-          glue("{path_growth}growth_rel{currel_month_lab}-{currel_year}_IN.csv"))
+source("ebirding-growth/ebirding-growth-functions.R")
 
 
-# breaks for y axis (different for states)
-y_breaks <- seq(0, max(data_growth$TOT.LISTS), length.out = 5) %>% 
-  round(digits = -2)
+# growth graph for India --------------------------------------------------
 
-y_breaks_lab <- glue("{round(y_breaks/1000, 1)} K")
+path_csv <- glue("{path_growth}growth_rel{currel_month_lab}-{currel_year}_IN.csv")
+path_png <- glue("{path_growth}growth_rel{currel_month_lab}-{currel_year}_IN.png")
 
-y_t1 <- data_growth %>% 
-  filter(YEAR == 2014) %>% 
-  pull(TOT.LISTS)
+# summarising number of complete checklists per year
+data_growth <- growth_stats(data, "country")
+write_csv(data_growth, file = path_csv)
 
-x_breaks <- 2000:(currel_year - 1)
-
-
-# plotting the line graph
-
-dataprog_lists <- ggplot(data_growth, aes(x = YEAR, y = TOT.LISTS)) +
-  geom_point(size = 3, colour = "#fcfa53") +
-  geom_line(linewidth = 1, colour = "#fcfa53") +
-  geom_vline(xintercept = 2014, linetype = "dotted", colour = "#CCCCCC80") +
-  geom_text(aes(x = 2014, y = y_t1, 
-                label = glue("{round(y_t1/1000, 1)} K")),
-            size = 3, colour = "#CCCCCC", nudge_x = 0.7) +
-  scale_x_continuous(breaks = x_breaks,
-                     # interested in after eBird established in India
-                     limits = c(min(x_breaks), max(x_breaks))) +
-  scale_y_continuous(breaks = y_breaks,
-                     labels = y_breaks_lab) +
-  coord_cartesian(clip = "off") +
-  labs(x = "Year", y = "Number of complete lists per year",
-       title = glue("eBirding in {cur_unit} over time"),
-       subtitle = glue("Data until {currel_month_lab} {currel_year}")) +
-  theme_void() +
-  theme(axis.text.x = element_text(colour = "#CCCCCC", size = 8),
-        axis.text.y = element_text(colour = "#CCCCCC", size = 9, hjust = 1,
-                                   margin = margin(0, 10, 0, 0)),
-        axis.title.y = element_text(angle = 90, vjust = 6, colour = "#CCCCCC"),
-        axis.title.x = element_text(colour = "#CCCCCC", vjust = -2),
-        
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(linetype = "longdash", colour = "#AAAAAA50"),
-        
-        plot.title = element_text(size = 20, face = "bold", colour = "#CCCCCC",
-                                  hjust = -0.15, vjust = 5),
-        plot.subtitle = element_text(size = 14, face = "bold", colour = "#AAAAAA50",
-                                     hjust = -0.11, vjust = 5),
-        plot.margin = unit(c(2, 1, 1, 2), "lines"),
-        
-        plot.background = element_rect(fill = "black", colour = NA),
-        panel.background = element_rect(fill = "black", colour = NA))
- 
-
-ggsave(glue("{path_growth}growth_rel{currel_month_lab}-{currel_year}_IN.png"), 
-       dataprog_lists,
+plot_growth <- data_growth %>% growth_plot("country")
+ggsave(plot_growth, file = path_png, 
        width = 11, height = 7, units = "in", dpi = 300)
+
+# add logo to plot
+add_logo(path_png, "bcilogo-framed.png", "top right") %>% 
+  magick::image_write(path = path_png)
+
+
+# upload to GDrive
+
+# "put" overwrites/updates existing file whereas "upload" creates new files each time
+drive_put(path_png, 
+          path = as_id("1f4-DVEzsHlvcU5-glg9NxidJf8-iUq1M"),
+          name = glue("{str_pad(0, width=2, pad='0')} India.png"))
+
+
+# growth graph for states -------------------------------------------------
+
+path_csv <- glue("{path_growth}growth_rel{currel_month_lab}-{currel_year}_ST.csv")
+
+# summarising number of complete checklists per year
+data_growth <- growth_stats(data, "state")
+write_csv(data_growth, file = path_csv)
+
+
+walk(unique(state_info$STATE.CODE), ~ {
+  
+  cur_state_info <- state_info %>% filter(STATE.CODE == .x)  
+  cur_state <- cur_state_info$STATE
+  cur_data <- data_growth %>% filter(STATE == cur_state)  
+  cur_gdrive_path <- gdrive_paths() %>% filter(STATE == cur_state) %>% pull(PATH)
+  
+
+  path_png <- glue("{path_growth}growth_rel{currel_month_lab}-{currel_year}_{.x}.png")
+
+  plot_growth <- cur_data %>% growth_plot("state", cur_state = cur_state)
+  ggsave(plot_growth, file = path_png, 
+         width = 11, height = 7, units = "in", dpi = 300)
+  
+  # add logo to plot
+  add_logo(path_png, "bcilogo-framed.png", "top right") %>% 
+    magick::image_write(path = path_png)
+  
+  
+  # upload to GDrive
+  # "put" overwrites/updates existing file whereas "upload" creates new files each time
+  drive_put(path_png, 
+            path = as_id(cur_gdrive_path),
+            name = glue("{str_pad(count, width=2, pad='0')} {cur_state}.png"))
+
+})
+
+
+

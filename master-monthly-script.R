@@ -32,11 +32,6 @@ source("EBD/latest_non-EBD_paths.R")
 
 #### parameters ####
 
-# update when latest available
-senspath <- "EBD/ebd_sensitive_relNov-2023_IN.txt" 
-groupaccspath <- "group-accounts/ebd_users_GA_relNov-2023.csv"
-
-
 preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
             "LOCALITY.ID","LOCALITY.TYPE","REVIEWED","APPROVED","LAST.EDITED.DATE",
             "STATE","STATE.CODE","COUNTY","COUNTY.CODE",
@@ -204,3 +199,7 @@ source("BCI-metrics/ebdMetrics.R")
 #### generating monthly coverage stats and maps ####
 
 source("ebirding-coverage/ebirding-coverage.R")
+
+# generating monthly growth graphs --------------------------------
+
+source("ebirding-coverage/ebirding-growth.R")
