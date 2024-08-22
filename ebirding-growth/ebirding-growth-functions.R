@@ -7,14 +7,16 @@ growth_stats <- function(data, scale = "country") {
     filter(ALL.SPECIES.REPORTED == 1) %>% 
     {if (scale == "country") {
       group_by(., YEAR) %>% 
-        reframe(TOT.LISTS = n_distinct(SAMPLING.EVENT.IDENTIFIER))
+        reframe(TOT.LISTS = n_distinct(SAMPLING.EVENT.IDENTIFIER),
+                TOT.OBS = n_distinct(OBSERVER.ID))
     } else if (scale == "state") {
       group_by(., STATE, YEAR) %>% 
-        reframe(TOT.LISTS = n_distinct(SAMPLING.EVENT.IDENTIFIER)) %>% 
+        reframe(TOT.LISTS = n_distinct(SAMPLING.EVENT.IDENTIFIER),
+                TOT.OBS = n_distinct(OBSERVER.ID)) %>% 
         group_by(STATE)
     }} %>% 
     complete(YEAR = 2000:currel_year, 
-             fill = list(TOT.LISTS = 0)) %>% 
+             fill = list(TOT.LISTS = 0, TOT.OBS = 0)) %>% 
     {if (scale == "country") {
       arrange(., YEAR)
     } else if (scale == "state") {
