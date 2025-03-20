@@ -4,9 +4,17 @@ This concerns the Indian eBirding community and data. The repo has code mainly f
 
 ## Automated BCI data tasks
 
-**One master R script linked to a master batch file to run several monthly data tasks in one go: `master-monthly-script.R`**
+The eBird Basic Dataset (EBD) is updated on the 16th of every month, and is downloaded for all of India (all species, all dates, region = India) and including SED and unvetted data. Following this, several data products of Bird Count India are also updated. These include several steps such as:
 
-*If latest users data is available, the group accounts list should be updated before running the automated master monthly script.*
+- Processing the EBD (and combining SED), adding useful columns and removing unnecessary ones, and storing as `.RData` file for use in downstream data pipelines.
+- Storing smaller datasets relevant for downstream data pipelines, such as monthly/yearly challenge analysis, Patch Monitoring Project analysis, etc.
+- Generating PJ’s monthly BCI metrics and (automatically) uploading to the Google Sheet for internal tracking
+- Generating monthly coverage stats and dot maps and (automatically) uploading to the Google Drive for display on BCI website
+- Generating monthly growth graphs and (automatically) uploading to the Google Drive for display on BCI website
+
+**One master R script to run several monthly data tasks in one go: `master-monthly-script.R`**
+
+*If latest users data is available, the group accounts list should be updated before running the automated master monthly script: the [group accounts script](https://github.com/birdcountindia/ebird-datasets/blob/c834eeb70bd1fd9a662bb2cfaf1fc1ace2957e7a/group-accounts/ebd_users_GA_script.R) is run and the `_0.csv` produced is manually edited, to classify each identified observer according to group account criteria (see more details). The `.csv` produced after this manual edit is the group account data to be used in all pipelines.*
 
 ## `group-accounts/`
 
