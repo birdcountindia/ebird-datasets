@@ -8,7 +8,7 @@ require(lubridate)
 require(glue)
 
 
-get_param(extra = TRUE)
+ebird_rel_param(extra = TRUE)
 # get_param(date_currel = "2024-06-01", extra = TRUE)
 
 
