@@ -11,6 +11,7 @@ require(ggformula)
 require(zoo)
 require(gifski)
 require(mltools)
+require(glue)
 require(rgeos)
 require(sp)
 require(sf)
@@ -23,10 +24,9 @@ getMonth = function (week)
   Months = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
   return (Months [as.integer(1 + ((week-1)/4))])
 }
-
-load("EBD/ebd_IN_relAug-2022.RData")
-load("maps.RData")
-load("clips.RData")
+load("EBD/ebd_IN_relAug-2025.RData")
+load("maps_sf.RData")
+load("grids_sf.RData")
 
 data = data %>%
   mutate(YEARs = YEAR,

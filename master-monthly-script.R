@@ -199,6 +199,10 @@ source("BCI-metrics/ebdMetrics.R")
 
 source("ebirding-coverage/ebirding-coverage.R")
 
+# eBird Growth gif --------------------------------------------------------
+
+source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R")
+
 # generating monthly growth graphs --------------------------------
 
 source("ebirding-growth/ebirding-growth.R")
