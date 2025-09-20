@@ -137,7 +137,7 @@ for (i in 2013:{currel_year})
 }
 
 
-# Creating .gif -----------------------------------------------------------
+# Creating gif  file-----------------------------------------------------------
 
 img_paths <- list.files("ebirding-coverage/yearly_maps",
                         pattern = "^indiamap[0-9]+\\.png$",
@@ -148,11 +148,11 @@ imgs <- image_read(img_paths)
 
 frames <- list()
 for (i in seq_along(img_paths)) {
-  frame <- image_read(img_paths[i])   # ✅ read one file -> magick image
+  frame <- image_read(img_paths[i])   
   frame <- image_annotate(
     frame,
     text     = paste("Data until", currel_month_lab, currel_year),
-    size     = 50,
+    size     = 60,
     gravity  = "southeast",
     location = "+20+20",
     color    = "grey"
@@ -166,7 +166,7 @@ gif.loc  <- glue("ebirding-coverage/yearly_maps/eBird_India_growth_2013-{currel_
 image_write(year_gif, path = gif.loc)
 
 # Upload to Google Drive
-cur_gdrive_path <- "19ytq5NX1RAsu1zibFORD9arYWN-GsFTw" #insert custom location
+cur_gdrive_path <- "1urQGjKH90JAVM8kW2Pr378BNuqzxwyRg" #insert custom location
 drive_put(media = gif.loc,
           path  = as_id(cur_gdrive_path),
           name  = glue("eBird_India_growth_2013-{currel_year}.gif"))

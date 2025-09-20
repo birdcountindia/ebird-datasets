@@ -2,6 +2,7 @@ library(lubridate)
 library(tidyverse)
 library(glue)
 library(skimmr)
+library(tictoc)
 library(magick)
 library(scales) # for comma format of numbers
 library(grid)
@@ -199,9 +200,11 @@ source("BCI-metrics/ebdMetrics.R")
 
 source("ebirding-coverage/ebirding-coverage.R")
 
-# eBird Growth gif --------------------------------------------------------
+# eBird Coverage gif --------------------------------------------------------
 
-source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R")
+
+source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R") 
+# AUG 2025-163.77 sec elapsed
 
 # generating monthly growth graphs --------------------------------
 
