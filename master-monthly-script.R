@@ -2,6 +2,7 @@ library(lubridate)
 library(tidyverse)
 library(glue)
 library(skimmr)
+library(tictoc)
 library(magick)
 library(scales) # for comma format of numbers
 library(grid)
@@ -36,9 +37,9 @@ preimp <- c("CATEGORY","EXOTIC.CODE","COMMON.NAME","OBSERVATION.COUNT",
             "LOCALITY.ID","LOCALITY.TYPE","REVIEWED","APPROVED","LAST.EDITED.DATE",
             "STATE","STATE.CODE","COUNTY","COUNTY.CODE",
             "LATITUDE","LONGITUDE","OBSERVATION.DATE","TIME.OBSERVATIONS.STARTED","OBSERVER.ID",
-            "PROTOCOL.TYPE","DURATION.MINUTES","EFFORT.DISTANCE.KM","LOCALITY","BREEDING.CODE",
+            "PROTOCOL.NAME","DURATION.MINUTES","EFFORT.DISTANCE.KM","LOCALITY","BREEDING.CODE",
             "NUMBER.OBSERVERS","ALL.SPECIES.REPORTED","GROUP.IDENTIFIER","SAMPLING.EVENT.IDENTIFIER",
-            "TRIP.COMMENTS","SPECIES.COMMENTS", "HAS.MEDIA")
+            "CHECKLIST.COMMENTS","SPECIES.COMMENTS", "HAS.MEDIA")
 
 # for PJ's metrics
 preimp_metrics <- c("COMMON.NAME", "STATE.CODE", "COUNTY.CODE", "OBSERVATION.DATE",
@@ -82,7 +83,7 @@ if (dataset_str == "ebd_IN_unv_smp_rel") {
 ### main EBD ###
 
 # this method using base R import takes only 373 sec with May 2022 release
-data <- read.ebd(path_ebd_main, preimp) 
+data <- read.ebd(path_ebd_main) #, preimp) 
 
 # # tidy import takes way longer, a total of 877 sec, but could be useful for smaller data
 # data <- read_delim(path_ebd_main, col_select = preimp,
@@ -91,7 +92,7 @@ data <- read.ebd(path_ebd_main, preimp)
 
 
 ### sensitive species ###
-senssp <- read.ebd(senspath, preimp)
+senssp <- read.ebd(senspath)
 
 ### combing the two ###
 data <- bind_rows(data, senssp) %>% 
@@ -115,7 +116,7 @@ data <- data %>%
 
 
 ### sed ###
-data_sed <- read.ebd(path_sed, preimp) %>% 
+data_sed <- read.ebd(path_sed) %>% 
   # group ID and dates
   mutate(GROUP.ID = ifelse(is.na(GROUP.IDENTIFIER), SAMPLING.EVENT.IDENTIFIER, GROUP.IDENTIFIER), 
          OBSERVATION.DATE = as.Date(OBSERVATION.DATE), 
@@ -189,7 +190,6 @@ if (real_month_num == 1) {
   print("Quitting from filtering for yearly challenge.")
 }
 
-
 #### generating PJ's monthly metrics out of EBD ####
 
 print(glue("Generating metrics for {currel_month_lab} {currel_year} from {path_ebd_main}"))
@@ -200,6 +200,13 @@ source("BCI-metrics/ebdMetrics.R")
 
 source("ebirding-coverage/ebirding-coverage.R")
 
+# eBird Coverage gif --------------------------------------------------------
+
+
+source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R") 
+# AUG 2025-163.77 sec elapsed
+
 # generating monthly growth graphs --------------------------------
 
 source("ebirding-growth/ebirding-growth.R")
+

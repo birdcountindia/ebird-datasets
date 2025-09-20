@@ -5,6 +5,11 @@ require(scales) # for comma format of numbers
 require(grid)
 require(glue)
 require(sf)
+library(skimmr)
+library(googledrive)
+
+source("EBD/latest_non-EBD_paths.R")
+source("monthly-param-auto.R")
 
 get_percentile_indices <- function(data, value, perc) {
   low = (1 - perc/100)/2
@@ -56,8 +61,10 @@ plot_lims <- function(){
   
 }
 
-path = "EBD/ebd_IN_relSep-2024.RData"
-load(path)
+#uncomment if you are running this separately
+#path = "EBD/ebd_IN_relAug-2025.RData"
+#load(path)
+
 data0 = data
 
 # order sampling event identifiers in ascending order
@@ -73,7 +80,7 @@ data = data0 %>%
   mutate(submit_year = 2013)
 
 upper_limit = length(data$submit_year)
-for (i in 2024:2014)
+for (i in {currel_year}:2014)
 {
   lower_limit = get_percentile_indices(data$YEAR, i, 99)$lower_bound
   data$submit_year[lower_limit:upper_limit] = i
@@ -88,7 +95,7 @@ plot_lims()
 
 
 
-for (i in 2013:2024)
+for (i in 2013:{currel_year})
 {
   data_loc <- data_loc_main %>%
     filter(submit_year <= i) %>%
@@ -121,10 +128,48 @@ for (i in 2013:2024)
              hjust = 1, vjust = 1)
   
   name = paste("indiamap",i,".png",sep="")
+  filepath <- file.path("ebirding-coverage/yearly_maps", name)
   
-  ggsave(name, map_cov_plain, 
+  ggsave(filepath, map_cov_plain, 
          # use png(), not ragg::agg_png() which does anti-aliasing, removing crispness of points
          device = png,
          units = "in", width = 8, height = 8, bg = "black", dpi = 300)
 }
+
+
+# Creating gif  file-----------------------------------------------------------
+
+img_paths <- list.files("ebirding-coverage/yearly_maps",
+                        pattern = "^indiamap[0-9]+\\.png$",
+                        full.names = TRUE)
+img_paths <- img_paths[order(as.numeric(gsub("[^0-9]", "", img_paths)))]
+imgs <- image_read(img_paths)
+
+
+frames <- list()
+for (i in seq_along(img_paths)) {
+  frame <- image_read(img_paths[i])   
+  frame <- image_annotate(
+    frame,
+    text     = paste("Data until", currel_month_lab, currel_year),
+    size     = 60,
+    gravity  = "southeast",
+    location = "+20+20",
+    color    = "grey"
+  )
+  frames[[i]] <- frame 
+}
+
+# Animate and save
+year_gif <- image_animate(image_join(frames), fps= 2)
+gif.loc  <- glue("ebirding-coverage/yearly_maps/eBird_India_growth_2013-{currel_year}.gif")
+image_write(year_gif, path = gif.loc)
+
+# Upload to Google Drive
+cur_gdrive_path <- "1urQGjKH90JAVM8kW2Pr378BNuqzxwyRg" #insert custom location
+drive_put(media = gif.loc,
+          path  = as_id(cur_gdrive_path),
+          name  = glue("eBird_India_growth_2013-{currel_year}.gif"))
+
+print(glue("Animation showing eBird Growth from 2013 - {currel_year} is uploaded to GDrive."))
 
