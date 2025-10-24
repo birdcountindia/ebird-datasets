@@ -134,6 +134,8 @@ rm(.Random.seed)
 save(data, data_sed, 
      file = maindatapath)
 
+#load(maindatapath) 
+#use this if you want to start from the middle, like rerunning the metrics.
 
 ### sliced data ###
 data_slice_G <- data %>% group_by(GROUP.ID) %>% slice(1) %>% ungroup()
@@ -200,13 +202,12 @@ source("BCI-metrics/ebdMetrics.R")
 
 source("ebirding-coverage/ebirding-coverage.R")
 
-# eBird Coverage gif --------------------------------------------------------
-
-
-source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R") 
-# AUG 2025-163.77 sec elapsed
-
 # generating monthly growth graphs --------------------------------
 
 source("ebirding-growth/ebirding-growth.R")
+
+# eBird Coverage gif --------------------------------------------------------
+
+source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R") 
+# AUG 2025-163.77 sec elapsed
 
