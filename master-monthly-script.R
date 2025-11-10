@@ -210,3 +210,6 @@ source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R")
 
 source("ebirding-growth/ebirding-growth.R")
 
+#If gifs for the above graphs are needed uncomment and run this ----------------
+#source("ebirding-growth/ebirding-growth-animated.R")
+
