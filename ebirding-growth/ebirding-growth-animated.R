@@ -5,8 +5,8 @@ library(gganimate)
 
 source("ebirding-growth/ebirding-growth-functions.R")
 
-gdrive_folder_id <- "15qe4oLGpOGIrhRvqPcZs2QqoFeNzxrBI"
-gdrive_folder_id_st.ut <- "128OFmHUltlrtyLZyy8SqlUv0HhtVb3ya"
+gdrive_folder_id <- "1mUthJ8hYXtor39NqLvqcopJd1fyJgXUL"
+gdrive_folder_id_st.ut <- "1mf4eRtfsyADRyKTFd8sIlBs-KGWfChek"
 
 #I think we might need to change the year from 2024 to 2025 inside this 
 #function once we enter next year
