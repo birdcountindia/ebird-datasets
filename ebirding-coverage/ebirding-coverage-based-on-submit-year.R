@@ -166,7 +166,7 @@ gif.loc  <- glue("ebirding-coverage/yearly_maps/eBird_India_growth_2013-{currel_
 image_write(year_gif, path = gif.loc)
 
 # Upload to Google Drive
-cur_gdrive_path <- "1urQGjKH90JAVM8kW2Pr378BNuqzxwyRg" #insert custom location
+cur_gdrive_path <- "1aLYfpLYjE1d0nlRaHgY4wIyDll0bD_TN" #insert custom location
 drive_put(media = gif.loc,
           path  = as_id(cur_gdrive_path),
           name  = glue("eBird_India_growth_2013-{currel_year}.gif"))

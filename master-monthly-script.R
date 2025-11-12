@@ -206,8 +206,13 @@ source("ebirding-coverage/ebirding-coverage.R")
 
 source("ebirding-growth/ebirding-growth.R")
 
+<<<<<<< HEAD
 # eBird Coverage gif --------------------------------------------------------
 
 source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R") 
 # AUG 2025-163.77 sec elapsed
+=======
+#If gifs for the above graphs are needed uncomment and run this ----------------
+#source("ebirding-growth/ebirding-growth-animated.R")
+>>>>>>> 504de5c2872a8787af5b81129f67e3d92fb96850
 
