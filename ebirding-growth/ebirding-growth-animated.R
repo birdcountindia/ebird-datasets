@@ -5,8 +5,8 @@ library(gganimate)
 
 source("ebirding-growth/ebirding-growth-functions.R")
 
-gdrive_folder_id <- "1mUthJ8hYXtor39NqLvqcopJd1fyJgXUL"
-gdrive_folder_id_st.ut <- "1mf4eRtfsyADRyKTFd8sIlBs-KGWfChek"
+gdrive_folder_id <- "15qe4oLGpOGIrhRvqPcZs2QqoFeNzxrBI"
+gdrive_folder_id_st.ut <- "128OFmHUltlrtyLZyy8SqlUv0HhtVb3ya"
 
 #I think we might need to change the year from 2024 to 2025 inside this 
 #function once we enter next year
@@ -125,7 +125,7 @@ path_gif <- glue("{path_growth}Anim/growth_rel{currel_month_lab}-{currel_year}_I
 # summarising number of complete checklists per year
 data_growth <- growth_stats(data, "country")
 write_csv(data_growth, file = path_csv)
-rm(data, data_sed)
+#rm(data, data_sed)
 
 plot_growth <- data_growth %>% growth_gif("country")
 plot_growth$data <- plot_growth$data %>% 

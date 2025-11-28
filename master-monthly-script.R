@@ -198,6 +198,9 @@ print(glue("Generating metrics for {currel_month_lab} {currel_year} from {path_e
 
 source("BCI-metrics/ebdMetrics.R")
 
+#### generating review queue stats for the country
+#source("ebird-review-stats/ebird-review-stats.R")
+
 #### generating monthly coverage stats and maps ####
 
 source("ebirding-coverage/ebirding-coverage.R")
@@ -206,13 +209,12 @@ source("ebirding-coverage/ebirding-coverage.R")
 
 source("ebirding-growth/ebirding-growth.R")
 
-<<<<<<< HEAD
 # eBird Coverage gif --------------------------------------------------------
 
 source("ebirding-coverage/ebirding-coverage-based-on-submit-year.R") 
 # AUG 2025-163.77 sec elapsed
-=======
+
 #If gifs for the above graphs are needed uncomment and run this ----------------
+#load(maindatapath)
 #source("ebirding-growth/ebirding-growth-animated.R")
->>>>>>> 504de5c2872a8787af5b81129f67e3d92fb96850
 
